@@ -1,0 +1,4 @@
+MAILTO=""
+
+00 10 */2 * * root bash -c "/usr/local/bin/cert-check.sh"
+00 01 * * 0 root bash -c "rm -rf /etc/letsencrypt/csr/*.pem"

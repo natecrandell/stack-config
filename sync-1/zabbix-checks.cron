@@ -1,0 +1,9 @@
+MAILTO=""
+*/5 * * * * root systemctl status dropbox | grep running; zabbix_sender -z 10.1.2.217 -s sync-1 -k dropbox-service-status -o $? > /dev/null
+*/5 * * * * root systemctl status seaf-cli | grep running; zabbix_sender -z 10.1.2.217 -s sync-1 -k seafcli-service-status -o $? > /dev/null
+*/5 * * * * root test -d /mnt/libraries/videos/TV; zabbix_sender -z 10.1.2.217 -s sync-1 -k libraries-mount-status -o $? > /dev/null
+*/5 * * * * root seaf-cli status | grep '^[^#]' | wc -l; zabbix_sender -z 10.1.2.217 -s sync-1 -k num-libraries -o $? > /dev/null
+
+# Check that seaf-cli libraries are synced, but don't alert on this during the seafile garbage collection job.
+*/5 * * * 1-6 root zabbix_sender -z 10.1.2.217 -s sync-1 -k num-unsynced-libraries -o $(seaf-cli status | grep '^[^#]' | grep -v synchronized | wc -l) > /dev/null
+*/5 0-3,6-23 * * 0 root zabbix_sender -z 10.1.2.217 -s sync-1 -k num-unsynced-libraries -o $(seaf-cli status | grep '^[^#]' | grep -v synchronized | wc -l) > /dev/null

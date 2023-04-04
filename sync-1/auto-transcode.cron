@@ -1,0 +1,9 @@
+MAILTO=""
+
+# Search homevideos for new files and transcode to h265
+# This is intended to run 5 mins after dropbox-cleanup, with a little time to transcode
+# on Mondays until the 0430 backup job runs. Since the job stops the container, in-progress
+# transcoding is killed. This shouldn't be a big problem, as any remaining transcoding will
+# be done the next time auto-transcode is run.
+45 1 * * 1,3,5 root bash -c "/usr/local/bin/auto-transcode.sh --all --clean --sleep=10s"
+

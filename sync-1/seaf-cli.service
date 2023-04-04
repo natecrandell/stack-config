@@ -1,0 +1,15 @@
+[Unit]
+Description=seaf-cli
+After=remote-fs.target network.target
+
+[Service]
+User=syncadmin
+Group=crandell
+Type=forking
+ExecStart=/usr/bin/seaf-cli start
+ExecStop=/usr/bin/seaf-cli stop
+StandardOutput=file:/home/syncadmin/.ccnet/logs/seaf-cli.log
+StandardError=file:/home/syncadmin/.ccnet/logs/seaf-cli.log
+
+[Install]
+WantedBy=multi-user.target

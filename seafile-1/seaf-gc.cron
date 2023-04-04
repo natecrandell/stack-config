@@ -1,0 +1,6 @@
+MAILTO="nate@crandell.us"
+SHELL=/bin/bash
+
+# Run weekly garbage collection
+45 4 * * 0 root systemctl stop seafile && sleep 5s && /home/sfadmin/seafile-server-latest/seaf-gc.sh; systemctl start seafile
+

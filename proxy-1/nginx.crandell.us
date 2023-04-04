@@ -1,0 +1,229 @@
+server {
+    listen 80;
+    server_name gavin.crandell.us;
+
+    root /var/www/gavin.crandell.us;
+    index index.html;
+}
+
+server {
+    listen 80;
+    server_name ceph.crandell.us cloud.crandell.us gitlab.crandell.us;
+    server_name pihole.crandell.us;
+    server_name pve.crandell.us tor.crandell.us unifi.crandell.us;
+    server_name zabbix.crandell.us zm.crandell.us;
+    return 301 https://$host$request_uri;
+}
+
+#-----------------------------------------------------------------Proxied sites
+
+server {
+    listen 443 ssl;
+    server_name ceph.crandell.us;
+
+    ssl_certificate /etc/letsencrypt/live/*.crandell.us/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/*.crandell.us/privkey.pem;
+
+    location / {
+        proxy_pass                            http://10.1.2.101:8080/;
+        proxy_set_header Host                 $host;
+        proxy_set_header X-Real-IP            $remote_addr;
+        proxy_set_header X-Forwarded-For      $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Scheme   $scheme;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name cloud.crandell.us;
+
+    ssl_certificate /etc/letsencrypt/live/*.crandell.us/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/*.crandell.us/privkey.pem;
+
+    location / {
+        proxy_pass          http://10.1.2.218:8000/;
+        proxy_set_header    Host $host;
+        proxy_set_header    X-Real-IP $remote_addr;
+        proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header    X-Forwarded-Host $server_name;
+        proxy_read_timeout  1200s;
+
+        # used for view/edit office file via Office Online Server
+        client_max_body_size 0;
+    }
+
+    location /seafhttp {
+        rewrite ^/seafhttp(.*)$ $1 break;
+        proxy_pass http://10.1.2.218:8082;
+        client_max_body_size 0;
+        proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        proxy_connect_timeout  36000s;
+        proxy_read_timeout  36000s;
+        proxy_send_timeout  36000s;
+        send_timeout  36000s;
+    }
+    # Adding the recommended location for /media breaks images in the web UI
+}
+
+server {
+    listen 443 ssl;
+    server_name photos.crandell.us;
+    client_max_body_size 500M;
+
+    ssl_certificate /etc/letsencrypt/live/*.crandell.us/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/*.crandell.us/privkey.pem;
+
+    location / {
+        proxy_pass                            http://10.1.2.236:2342/;
+        proxy_set_header Host                 $host;
+        proxy_set_header X-Real-IP            $remote_addr;
+        proxy_set_header X-Forwarded-For      $proxy_add_x_forwarded_for;
+        proxy_set_header Upgrade              $http_upgrade;
+        proxy_set_header Connection           "upgrade";
+        proxy_buffering off;
+        proxy_http_version 1.1;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name pihole.crandell.us;
+
+    ssl_certificate /etc/letsencrypt/live/*.crandell.us/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/*.crandell.us/privkey.pem;
+
+    location / {
+        proxy_pass                            http://10.1.2.235/;
+        proxy_set_header Host                 $host;
+        proxy_set_header X-Real-IP            $remote_addr;
+        proxy_set_header X-Forwarded-For      $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Scheme   $scheme;
+    }
+}
+
+server {
+    listen 443 ssl;
+    listen 8006;
+    server_name pve.crandell.us;
+
+    ssl_certificate /etc/letsencrypt/live/*.crandell.us/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/*.crandell.us/privkey.pem;
+
+    location / {
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_pass https://10.1.2.111:8006/;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name tor.crandell.us;
+
+    ssl_certificate /etc/letsencrypt/live/*.crandell.us/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/*.crandell.us/privkey.pem;
+
+    location / {
+        proxy_pass                            http://10.1.2.230:9091/;
+        proxy_set_header Host                 $host;
+        proxy_set_header X-Real-IP            $remote_addr;
+        proxy_set_header X-Forwarded-For      $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Scheme   $scheme;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name unifi.crandell.us;
+
+    ssl_certificate /etc/letsencrypt/live/*.crandell.us/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/*.crandell.us/privkey.pem;
+
+    location / {
+        proxy_pass                            https://10.1.2.227:8443/;
+        proxy_set_header Host                 $host;
+        proxy_set_header X-Real-IP            $remote_addr;
+        proxy_set_header X-Forwarded-For      $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Scheme   $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name zabbix.crandell.us;
+
+    ssl_certificate /etc/letsencrypt/live/*.crandell.us/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/*.crandell.us/privkey.pem;
+
+    location / {
+        proxy_pass                            http://10.1.2.217/;
+        proxy_set_header Host                 $host;
+        proxy_set_header X-Real-IP            $remote_addr;
+        proxy_set_header X-Forwarded-For      $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Scheme   $scheme;
+        proxy_read_timeout 1200s;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name zm.crandell.us;
+
+    ssl_certificate /etc/letsencrypt/live/*.crandell.us/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/*.crandell.us/privkey.pem;
+
+    location / {
+        proxy_pass                            http://10.1.2.221/;
+        proxy_set_header Host                 $host;
+        proxy_set_header X-Real-IP            $remote_addr;
+        proxy_set_header X-Forwarded-For      $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Scheme   $scheme;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name zm1.crandell.us;
+
+    ssl_certificate /etc/letsencrypt/live/*.crandell.us/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/*.crandell.us/privkey.pem;
+
+    location / {
+        proxy_pass                            http://10.1.2.221/;
+        proxy_set_header Host                 $host;
+        proxy_set_header X-Real-IP            $remote_addr;
+        proxy_set_header X-Forwarded-For      $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Scheme   $scheme;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name zm2.crandell.us;
+
+    ssl_certificate /etc/letsencrypt/live/*.crandell.us/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/*.crandell.us/privkey.pem;
+
+    location / {
+        proxy_pass                            http://10.1.2.222/;
+        proxy_set_header Host                 $host;
+        proxy_set_header X-Real-IP            $remote_addr;
+        proxy_set_header X-Forwarded-For      $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Scheme   $scheme;
+    }
+}
+
+#---------------------------------------------------------------TLD sinkhole
+
+server {
+    listen 80;
+    listen 443;
+    server_name crandell.us;
+
+    location / {
+    }
+}

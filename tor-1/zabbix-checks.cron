@@ -1,0 +1,2 @@
+MAILTO=""
+*/5 * * * * root systemctl status transmission-daemon | grep running; zabbix_sender -z 10.1.2.217 -s tor-1 -k transmission-service-status -o $? > /dev/null

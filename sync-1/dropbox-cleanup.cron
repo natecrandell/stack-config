@@ -1,0 +1,21 @@
+MAILTO=""
+
+# Before the scheduled changes, delete unneeded pic dirs, then rsync a copy of Dropbox to a Seafile library.
+20 1 * * 1 root rm -rf /home/syncadmin/Dropbox/shuh/Movies/.thumbnails /home/syncadmin/Dropbox/nate/DCIM/Camera/.inflight /home/syncadmin/Dropbox/nate/DCIM/Camera/.inflight_lowres/; rsync -a --delete --exclude=".dropbox" --exclude=".dropbox.cache/" --exclude="**/.thumbnails/" --exclude="**/.inflight/" --exclude="**/.inflight_lowres/" /home/syncadmin/Dropbox/ /mnt/libraries/dropbox/
+
+# Move pics/vids for Nate/Shuh
+40 1 * * 1,3,5 root bash -c "/usr/local/bin/dropbox-cleanup.sh --all"
+
+# Move weekly (aCar, aWallet) and monthly (SMSBackup) files
+0 4 * * 1 root find /home/syncadmin/Dropbox/nate/zonewalker-acar/ -name *conflict* -delete; rsync -a --remove-source-files /home/syncadmin/Dropbox/nate/zonewalker-acar/aCar*.abp /mnt/libraries/backup/acar/; rsync -a /home/syncadmin/Dropbox/Apps/aWallet\ Cloud/*.crypt /mnt/libraries/backup/awallet/
+30 06 05 * * root mv /home/syncadmin/Dropbox/nate/SMSBackupRestore/* /mnt/libraries/documents/Home\ Vault/Personal\ Data/Nate/sms/
+
+# Remove the crap left behind after dropboxd does its auto-update
+2 0 * * 0 root rm -rf /home/syncadmin/.dropbox-dist-old-*
+
+# Room to improve dropbox-cleanup.sh:
+#   Photos/Videos:
+#   - Why wait a month to see new stuff? Copy down ASAP. The 30 day thing should just be phone clean-up. (Probably can't transcode until mv tho)
+#   Other files:
+#   - aWallet - prune old
+

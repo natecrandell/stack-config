@@ -1,0 +1,5 @@
+MAILTO=""
+
+# Update Photoprism index. This is positioned to run right after the weekly backup.
+00 5 * * 1,3,5 root bash -c "cd /home/ncrandell && docker compose exec photoprism photoprism index --cleanup"
+

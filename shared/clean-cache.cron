@@ -1,0 +1,5 @@
+MAILTO=""
+
+# Clean the apt cache immediately before the weekly backup job to reduce storage overhead
+45 3 * * 1 root bash -c "apt-get clean all"
+
