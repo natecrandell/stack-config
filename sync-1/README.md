@@ -93,7 +93,10 @@ ln -s /mnt/libraries/config/stack/sync-1/auto-transcode.cron /etc/cron.d/auto-tr
 
 ```bash
 apt install git -y
-# Clone stack-config so that repo root appears at /mnt/libraries/config/stack/
+# Clone stack-config
+cd /mnt/libraries/config/
+git clone https://gitlab-1.crandell.us/nate/stack-config.git
+# The root of the repo needs to be at /mnt/libraries/config/stack/
 ```
 
 ### Misc config: crons, logrotate
@@ -103,6 +106,7 @@ ln -s /mnt/libraries/config/stack/sync-1/zabbix-checks.cron /etc/cron.d/zabbix-c
 ln -s /mnt/libraries/config/stack/shared/clean-cache.cron /etc/cron.d/clean-cache
 ln -s /mnt/libraries/config/stack/sync-1/seaf-cli.logrotate /etc/logrotate.d/seaf-cli
 ln -s /mnt/libraries/config/stack/sync-1/dropbox.logrotate /etc/logrotate.d/dropbox
+ln -s /mnt/libraries/config/stack/sync-1/README.md /root/README.md
 ```
 
 ## Misc Notes

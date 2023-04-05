@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: /home/ncrandell/kompose convert
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: photoprism
+  name: photoprism
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: photoprism
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: /home/ncrandell/kompose convert
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: photoprism
+    spec:
+      containers:
+        - env:
+            - name: PHOTOPRISM_ADMIN_PASSWORD
+              value: insecure
+            - name: PHOTOPRISM_DARKTABLE_PRESETS
+              value: "false"
+            - name: PHOTOPRISM_DATABASE_DRIVER
+              value: mysql
+            - name: PHOTOPRISM_DATABASE_NAME
+              value: photoprism
+            - name: PHOTOPRISM_DATABASE_PASSWORD
+              value: insecure
+            - name: PHOTOPRISM_DATABASE_SERVER
+              value: mariadb:3306
+            - name: PHOTOPRISM_DATABASE_USER
+              value: photoprism
+            - name: PHOTOPRISM_DEBUG
+              value: "false"
+            - name: PHOTOPRISM_DETECT_NSFW
+              value: "false"
+            - name: PHOTOPRISM_DISABLE_SETTINGS
+              value: "false"
+            - name: PHOTOPRISM_DISABLE_TENSORFLOW
+              value: "false"
+            - name: PHOTOPRISM_DISABLE_WEBDAV
+              value: "false"
+            - name: PHOTOPRISM_EXPERIMENTAL
+              value: "false"
+            - name: PHOTOPRISM_HTTP_COMPRESSION
+              value: gzip
+            - name: PHOTOPRISM_HTTP_PORT
+              value: "2342"
+            - name: PHOTOPRISM_PUBLIC
+              value: "false"
+            - name: PHOTOPRISM_READONLY
+              value: "false"
+            - name: PHOTOPRISM_SITE_AUTHOR
+            - name: PHOTOPRISM_SITE_CAPTION
+              value: Browse Your Life
+            - name: PHOTOPRISM_SITE_DESCRIPTION
+            - name: PHOTOPRISM_SITE_TITLE
+              value: PhotoPrism
+            - name: PHOTOPRISM_SITE_URL
+              value: http://localhost:2342/
+            - name: PHOTOPRISM_UPLOAD_NSFW
+              value: "true"
+          image: photoprism/photoprism:latest
+          name: photoprism
+          ports:
+            - containerPort: 2342
+          resources: {}
+          volumeMounts:
+            - mountPath: /photoprism/originals
+              name: photoprism-claim0
+            - mountPath: /photoprism/storage
+              name: photoprism-claim1
+      restartPolicy: Always
+      volumes:
+        - name: photoprism-claim0
+          persistentVolumeClaim:
+            claimName: photoprism-claim0
+        - name: photoprism-claim1
+          persistentVolumeClaim:
+            claimName: photoprism-claim1
+status: {}

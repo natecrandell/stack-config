@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<gameList>
+	<game>
+		<path>./Mario Kart 64 (E) (V1.1) [!].z64</path>
+		<name>Mario Kart 64</name>
+		<desc>Three… Two… One… GO!  The signal light changes and you drop the pedal to the metal.  Take on up to three friends in the split-screen VS games, or race solo in the Mario GP.  Tell your friends to bring it on in the highly competitive Battle mode.  Advanced features allow you to race with your “Ghost”.  The driving data from your best run appears as a transparent character on the screen.  No longer must you simply race against the clock -- you can actually race against yourself!
+
+* Save your hottest Ghost data to a portable N64 Controller Pak!
+* Collect multiple power-up items!
+* Twenty different courses -- 4 Cups with 4 courses each and 4 special Battle mode courses!
+* Everyone’s favorite characters are back and gorgeously rendered, including two new additions, Donkey Kong and Wario!</desc>
+		<image>/home/pi/.emulationstation/downloaded_images/n64/Mario Kart 64 (E) (V1.1) [!]-image.jpg</image>
+		<rating>0.7</rating>
+		<releasedate>19970210T000000</releasedate>
+		<developer>Nintendo</developer>
+		<publisher>Nintendo</publisher>
+		<genre>Racing</genre>
+		<players>4+</players>
+		<favorite>true</favorite>
+		<playcount>36</playcount>
+		<lastplayed>20190213T004523</lastplayed>
+	</game>
+</gameList>

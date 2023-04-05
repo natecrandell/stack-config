@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<gameList>
+	<game>
+		<path>./CTR - Crash Team Racing (USA).cue</path>
+		<name>CTR - Crash Team Racing (USA)</name>
+		<playcount>2</playcount>
+		<lastplayed>20181224T175620</lastplayed>
+	</game>
+	<game>
+		<path>./Need for Speed - High Stakes (USA).cue</path>
+		<name>Need for Speed - High Stakes (USA)</name>
+		<playcount>1</playcount>
+		<lastplayed>20181224T175535</lastplayed>
+	</game>
+	<game>
+		<path>./Pac-Man World (USA).cue</path>
+		<name>Pac-Man World (USA)</name>
+		<playcount>1</playcount>
+		<lastplayed>20181224T181046</lastplayed>
+	</game>
+	<game>
+		<path>./Twisted Metal (USA).cue</path>
+		<name>Twisted Metal (USA)</name>
+		<playcount>2</playcount>
+		<lastplayed>20181224T180032</lastplayed>
+	</game>
+	<game>
+		<path>./WarCraft II - The Dark Saga (USA) (En,Fr,De,Es,It).cue</path>
+		<name>WarCraft II - The Dark Saga (USA) (En,Fr,De,Es,It)</name>
+		<playcount>10</playcount>
+		<lastplayed>20181226T171453</lastplayed>
+	</game>
+</gameList>

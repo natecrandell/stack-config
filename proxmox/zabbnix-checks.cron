@@ -1,0 +1,1 @@
+*/4 * * * * root tail -n 120 /var/log/ceph/ceph.log | grep degraded; zabbix_sender -z 10.1.1.217 -s pve-1 -k ceph-degraded -o $? > /dev/null

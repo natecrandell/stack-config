@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: mariadb
+  strategy:
+    type: Recreate
+  template:
+    spec:
+      containers:
+        - args:
+            - mysqld
+            - --transaction-isolation=READ-COMMITTED
+            - --character-set-server=utf8mb4
+            - --collation-server=utf8mb4_unicode_ci
+            - --max-connections=512
+            - --innodb-rollback-on-timeout=OFF
+            - --innodb-lock-wait-timeout=50
+          env:
+            - name: MYSQL_DATABASE
+              value: photoprism
+            - name: MYSQL_PASSWORD
+              value: insecure
+            - name: MYSQL_ROOT_PASSWORD
+              value: please_change
+            - name: MYSQL_USER
+              value: photoprism
+          image: mariadb:10.5
+          name: mariadb
+          resources: {}
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mariadb-claim0
+      restartPolicy: OnFailure
+      volumes:
+        - name: mariadb-claim0
+          persistentVolumeClaim:
+            claimName: mariadb-claim0
+status: {}

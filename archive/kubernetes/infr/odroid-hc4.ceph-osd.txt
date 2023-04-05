@@ -1,0 +1,44 @@
+# Configure an Odroid-HC4 as Ceph-OSD
+
+# Prepare SD card
+  # Download Ubuntu image: https://wiki.odroid.com/odroid-hc4/getting_started/os_installation_guide#tab__odroid-c4hc4
+  # Use Etcher to put image on card (https://www.balena.io/etcher/)
+
+# Boot the Odroid-HC4 and login root/odroid
+
+# Install salt-minion
+curl -L https://bootstrap.saltstack.com -o install_salt.sh
+chmod +x install_salt.sh
+./install_salt.sh -P
+vi /etc/salt/minion
+	master: 10.1.1.231
+	id: ceph-osd-a
+
+# Accept the salt key on the master
+# Don't run a highstate until I get the zabbix-agent state fixed
+
+# SSH to Odroid
+vim /etc/apt/sources.list.d/zabbix.list
+deb http://repo.zabbix.com/zabbix/5.4/ubuntu-arm64 focal main
+
+apt-get update && apt-get install -y zabbix-agent 
+
+vim /etc/zabbix/zabbix_agentd.conf
+    Server=10.1.1.217,zabbix-1.crandell.us
+    ServerActive=10.1.1.217
+service zabbix-agent restart
+
+vim /etc/netplan/01-netcfg.yaml
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eth0:
+      dhcp4: no
+      addresses:
+        - 10.1.2.201/24
+      gateway4: 10.1.1.1
+
+netplan apply
+
+apt-get dist-upgrade -y && reboot

@@ -1,0 +1,193 @@
+<?xml version="1.0"?>
+<gameList>
+	<game>
+		<path>./1943 (U).nes</path>
+		<name>1943: The Battle of Midway</name>
+		<desc>The game is set in the Pacific theater of World War II, off the coast of the Midway Atoll. The goal is to attack the Japanese Air Fleet that bombed the players' American Aircraft Carrier, pursue all Japanese Air and Sea forces, fly through the 16 levels of play, make their way to the Japanese battleship Yamato and destroy her. 11 Levels consist of an Air-to-Sea battle (with a huge battleship or an aircraft carrier as an End-Level Boss), while 5 levels consist of an all-aerial battle against a squadron of Japanese Bombers and a Mother Bomber that needs to be destroyed.</desc>
+		<image>/home/pi/.emulationstation/downloaded_images/nes/1943 (U)-image.jpg</image>
+		<rating>0.4</rating>
+		<releasedate>19870601T000000</releasedate>
+		<developer>Capcom</developer>
+		<publisher>Capcom</publisher>
+		<genre>Shooter</genre>
+		<players>2</players>
+	</game>
+	<game>
+		<path>./Blades of Steel (U).nes</path>
+		<name>Blades of Steel</name>
+		<desc>At the beginning of the game, players can select either "Exhibition" or "Tournament" matches. An exhibition match is just one game played against either the computer or another player. Tournament matches are similar to the NHL playoffs. It starts out as one team of the player's choice going against other teams in a playoff style tournament. The team that is successful in beating all of the opposing teams is awarded the Konami Cup.</desc>
+		<image>/home/pi/.emulationstation/downloaded_images/nes/Blades of Steel (U)-image.jpg</image>
+		<rating>0.7</rating>
+		<releasedate>19881201T000000</releasedate>
+		<developer>Konami</developer>
+		<publisher>Konami</publisher>
+		<genre>Sports</genre>
+		<players>2</players>
+	</game>
+	<game>
+		<path>./Blaster Master (U).nes</path>
+		<name>Blaster Master</name>
+		<desc>You've fallen down a hidden manhole into a world of creatures so terrifying they'd scare the rats away. You can panic and perish, or blast your way through an endless maze of tunnels, searching for the secret passages to your escape. And that's the easy part. Because the Masters of the Caverns lay waiting - prehistoric creatures so powerful, so gigantic, they literally fill your screen! So load your arsenal and get ready for Blaster Master.</desc>
+		<image>/home/pi/.emulationstation/downloaded_images/nes/Blaster Master (U)-image.jpg</image>
+		<rating>0.7</rating>
+		<releasedate>19881101T000000</releasedate>
+		<developer>Sunsoft</developer>
+		<publisher>Sunsoft</publisher>
+		<genre>Action</genre>
+	</game>
+	<game>
+		<path>./Bubble Bobble (U).nes</path>
+		<name>Bubble Bobble</name>
+		<desc>THESE ARE TWO HUNGRY DINO-MIGHTS AND THEY'VE GOT BUBBLE FIGHT'N FUN DOWN TIGHT. You and your two brontosaurus buddies, Bub and Bob, are up to your brows in bubble troubles. You've got to battle battalions of bullies by blowing and bursting billions of bubbles. It's a fast-paced bubble banquet through over 100 screens of slap happy suds. Got an appetite for fun... then get blowin'.</desc>
+		<image>/home/pi/.emulationstation/downloaded_images/nes/Bubble Bobble (U)-image.jpg</image>
+		<rating>0.8</rating>
+		<releasedate>19900101T000000</releasedate>
+		<developer>Taito</developer>
+		<publisher>Taito</publisher>
+		<genre>Puzzle</genre>
+		<players>2</players>
+	</game>
+	<game>
+		<path>./Captain Skyhawk (USA).nes</path>
+		<name>Captain Skyhawk</name>
+		<desc>The player takes a role of a fighter pilot working to repel an alien invasion. Aliens have invaded Earth, and have built four land bases. These bases are designed to drain Earth's energy and feed it to their mother space station. If the space station is allowed to obtain enough energy, it will destroy the Earth with a massive laser blast. The player must destroy the enemy bases, then go after the space station itself. Scientists, during the course of the game, are working on a top-secret Neutron Cannon. During several missions, the player must make supply drops to the scientists working underground. Sometimes, the aliens will have a scientist captive. Then the player must defeat the alien base and take the scientist to safety.</desc>
+		<image>/home/pi/.emulationstation/downloaded_images/nes/Captain Skyhawk (USA)-image.jpg</image>
+		<rating>0.7</rating>
+		<developer>Rare</developer>
+		<publisher>Milton Bradley</publisher>
+		<genre>Shooter</genre>
+	</game>
+	<game>
+		<path>./Castlevania (E).nes</path>
+		<name>Castlevania</name>
+		<desc>If you think it's scary on the outside, wait'll you see the basement! You're in for the longest night of your life. Ghosts, goblins, demons, wolves, bats - creatures lurking around every corner. As you descend deeper and deeper, they get thicker and thicker. Better stick close to the cavern floor - it's your only chance of finding a weapon or two. You're gonna need 'em. Because when you finally meet the Count, you know he'll be going for the jugular. So keep your courage up and your stake sharp. And say your prayers!</desc>
+		<image>/home/pi/.emulationstation/downloaded_images/nes/Castlevania (E)-image.png</image>
+		<rating>0.6</rating>
+		<releasedate>19870501T000000</releasedate>
+		<developer>Konami</developer>
+		<publisher>Konami</publisher>
+		<genre>Action</genre>
+	</game>
+	<game>
+		<path>./Metal Gear (U).nes</path>
+		<name>Metal Gear</name>
+		<desc>Outer Heaven leader CaTaffy has activated the ultimate super weapon: Metal Gear! Responding to the crisis, covert unit "Fox Hound" is called into action, and that's where you come into play. Trained in hand-to-hand combat and skilled in every weapon known to man, you're Fox Hound's lethal fighting machine, code named "Solid Snake". But on this mission you better be sly as well, to surprise heavily-armed enemies, busting 'em up quietly and rescuing their hostages before alarms are triggered. Plus you gotta maintain radio contact with Commander South, who'll feed you crucial info on Metal Gear's whereabouts. To survive, capture sub-machine guns, Barettas, grenade launchers, and plastic explosives, until you find and destroy Metal Gear, ending CaTaffy's reign of terror!</desc>
+		<image>/home/pi/.emulationstation/downloaded_images/nes/Metal Gear (U)-image.jpg</image>
+		<rating>0.6</rating>
+		<releasedate>19870707T000000</releasedate>
+		<developer>Konami</developer>
+		<publisher>Ultra Games</publisher>
+		<genre>Action</genre>
+	</game>
+	<game>
+		<path>./RC Pro-Am (PC10).nes</path>
+		<name>R.C. Pro-AM</name>
+		<desc>Nintendo puts you in control.
+  Grab your controller and pull up to the starting line. It's you against three other all-star racers. You'll face hair-pin turns, outragerous curves, oil slicks and rainclouds as you make your way through 32 trecherous courses.
+  Along the way you'll pick up performance boosters like Turbo Accelerations, Sticky Tires and Top Speed that will help you get to the finish line first. But if the going gets rough, use your bombs and missles to knock out the competition to make sure you're the winner.</desc>
+		<image>/home/pi/.emulationstation/downloaded_images/nes/RC Pro-Am (PC10)-image.jpg</image>
+		<rating>0.7</rating>
+		<releasedate>19881231T000000</releasedate>
+		<developer>RARE</developer>
+		<publisher>Nintendo</publisher>
+		<genre>Racing</genre>
+	</game>
+	<game>
+		<path>./Teenage Mutant Ninja Turtles 2 (U).nes</path>
+		<name>Teenage Mutant Ninja Turtles II: The Arcade Game</name>
+		<desc>Yo! After being treated like garbage by the Ninja Turtles, Shredder has trained a new, more merciless breed of Foot Soldiers to inflict his revenge: A clan of over 700 Taekwondo turtle terminators who have once again captured April O'Neil to use as turtle bait. Fortunately you don't have to face these freaks of torture alone. For the first time ever, two dudes or dudettes can join forces and double-team Shredder, kicking shell while covering each others tails.
+
+But to survive you've gotta fight through 8 action-packed arcade levels, including Vinnie's Valet "Stalking" Lot and the Soho Sewer System, plus two new never-before-seen shell-squashing stages! Each of these deathtraps is reinforced by lethal electro zappers, laser beams, freezer burners or enemies such as Scorpion Robots, Stone Warriors and Baxter Stockman. Shredder has also hired the all-powerful Tora and Shogun, two alien bounty hunters who have never known defeat.
+
+Even though Master Splinter has prepared the turtles well for battle, teaching them radical new attack moves, it doesn't mean this war to save April and turtlekind will be a piece of cake or even a slice of pizza. Because with the forces of revenge on his side and the bounty boys in town, it's payback time for Shredder!</desc>
+		<image>/home/pi/.emulationstation/downloaded_images/nes/Teenage Mutant Ninja Turtles 2 (U)-image.jpg</image>
+		<rating>0.7</rating>
+		<releasedate>19901201T000000</releasedate>
+		<developer>Konami</developer>
+		<publisher>Ultra Games</publisher>
+		<genre>Action</genre>
+		<players>2</players>
+	</game>
+	<game>
+		<path>./Legend of Zelda, The (U) (PRG1) [!].nes</path>
+		<name>The Legend of Zelda</name>
+		<desc>Welcome to the Legend of Zelda.  Where the only sound you’ll hear is your own heart pounding as you race through forests, lakes, mountains and dungeonous mazes in an attempt to restore peace to the land of Hyrule.  Along the way you’ll be challenged by Tektites, Wizzrobes and an endless array of ruthless creatures who’ll stop at nothing to prevent you from finding the lost fragments of the Triforce of Wisdom.  But don’t despair.  With a little luck and a lot of courage, you’ll conquer your adversaries, unite the Triforce fragments and unravel the mystery of the Legend of Zelda!
+
+• Explore the vast Overworld terrain of the land of Hyrule and discover hidden treasures.
+• Explore the mystical labyrinths of the Underworld and ward-off ruthless enemies.</desc>
+		<image>/home/pi/.emulationstation/downloaded_images/nes/Legend of Zelda, The (U) (PRG1) [!]-image.png</image>
+		<rating>0.7</rating>
+		<releasedate>19870701T000000</releasedate>
+		<developer>Nintendo R&amp;D4</developer>
+		<publisher>Nintendo</publisher>
+		<genre>Action</genre>
+		<playcount>1</playcount>
+		<lastplayed>20181224T214710</lastplayed>
+	</game>
+	<game>
+		<path>./Ninja Gaiden (U).nes</path>
+		<name>Ninja Gaiden</name>
+		<desc>Ryu Hayabusa of the Dragon Ninja Clan receives a letter from his father, saying that he was leaving for a duel with an unknown warrior. Should he not return, Ryu was to go to America and seek a man named Walter Smith. Ryu honors his father's last request, and travels to America. While there, he is kidnapped by a CIA agent and given a statue of a hideous beast.</desc>
+		<image>/home/pi/.emulationstation/downloaded_images/nes/Ninja Gaiden (U)-image.jpg</image>
+		<rating>0.7</rating>
+		<releasedate>19890301T000000</releasedate>
+		<developer>Tecmo</developer>
+		<publisher>Tecmo</publisher>
+		<genre>Action</genre>
+		<favorite>true</favorite>
+		<playcount>1</playcount>
+		<lastplayed>20190129T014705</lastplayed>
+	</game>
+	<game>
+		<path>./Super Mario Bros (E).nes</path>
+		<name>Super Mario Bros.</name>
+		<desc>Do you have what it takes to save the Mushroom Princess?  You’ll have to think fast and move even faster to complete this quest!  The Mushroom Princess is being held captive by the evil Koopa tribe of turtles.  It’s up to you to rescue her from the clutches of the Koopa King before time runs out.  But it won’t be easy.  To get to the Princess, you’ll have to climb mountains, cross seas, avoid bottomless pits, fight off turtle soldiers and a host of black magic traps that only a Koopa King can devise.  It’s another non-stop adventure from the Super Mario Bros.!</desc>
+		<image>/home/pi/.emulationstation/downloaded_images/nes/Super Mario Bros (E)-image.jpg</image>
+		<rating>0.8</rating>
+		<releasedate>19850913T000000</releasedate>
+		<developer>Nintendo Creative Department</developer>
+		<publisher>Nintendo</publisher>
+		<genre>Action</genre>
+		<players>2</players>
+		<favorite>true</favorite>
+		<playcount>6</playcount>
+		<lastplayed>20190202T185227</lastplayed>
+	</game>
+	<game>
+		<path>./Super Mario Bros 3 (E).nes</path>
+		<name>Super Mario Bros. 3</name>
+		<desc>Fight monsters and mini-bosses, avoid ghosts and the burning sun.  Make your way through water and quicksand.  Dodge cannonballs and bullets and rescue the King’s wand!
+
+In Super Mario Bros. 3 there are more warps, more chances at extra lives, and new special suits!  The raccoon suit lets you fly and knock out blocks.  The frog suit helps you out-swim the deadly fish.  There are suits for every occasion!
+
+Store up flowers and mushrooms to use later on.  Play game-show type bonus rounds!  Go back to that last screen and get a mushroom!  Pause to take a break, then continue where you left off!
+
+Super Mario Bros. 3 is fun to play alone, or team up with a buddy to prolong the adventure!
+
+Note: Turn based Co-op as players work in turn to clear individual levels in a world. There is also a vs. mini-game where players try to steal items from each other.</desc>
+		<image>/home/pi/.emulationstation/downloaded_images/nes/Super Mario Bros 3 (E)-image.jpg</image>
+		<rating>0.8</rating>
+		<releasedate>19900212T000000</releasedate>
+		<developer>Nintendo R&amp;D4</developer>
+		<publisher>Nintendo</publisher>
+		<genre>Action</genre>
+		<players>2</players>
+		<playcount>3</playcount>
+		<lastplayed>20190202T183935</lastplayed>
+	</game>
+	<game>
+		<path>./Tetris (U) [!].nes</path>
+		<name>Tetris</name>
+		<desc>A random sequence of tetrominoes (sometimes called "tetrads" in older versions)—shapes composed of four square blocks each—fall down the playing field (a rectangular vertical shaft, called the "well" or "matrix"). The objective of the game is to manipulate these tetrominoes, by moving each one sideways and rotating it by 90 degree units, with the aim of creating a horizontal line of blocks without gaps. When such a line is created, it disappears, and any block above the deleted line will fall. With every ten lines that are cleared, the game enters a new level. As the game progresses, each level causes the tetrominoes to fall faster, and the game ends when the stack of tetrominoes reaches the top of the playing field and no new tetrominoes are able to enter. In certain versions, the game can also end if the player is able to get all the way to level 15.
+
+All of the tetrominoes are capable of single and double clears. I, J, and L are able to clear triples. Only the I tetromino has the capacity to clear four lines simultaneously, and this is referred to as a "tetris". (This may vary depending on the rotation and compensation rules of each specific Tetris implementation. For instance, in the Super Rotation System used in most recent implementations, called "Easy Spin" in Tetris Worlds, certain rare situations allow T, S and Z to 'snap' into tight spots and clear triples.)</desc>
+		<image>/home/pi/.emulationstation/downloaded_images/nes/Tetris (U) [!]-image.jpg</image>
+		<rating>0.7</rating>
+		<releasedate>19891101T000000</releasedate>
+		<developer>Bullet-Proof Software</developer>
+		<publisher>Nintendo</publisher>
+		<genre>Puzzle</genre>
+		<playcount>6</playcount>
+		<lastplayed>20190202T164049</lastplayed>
+	</game>
+</gameList>

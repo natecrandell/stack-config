@@ -1,0 +1,24 @@
+@charset "UTF-8";
+@import url(http://fonts.googleapis.com/css?family=Lato:300,400,700);
+
+a {text-decoration: none;}
+
+body {
+	margin: 0;
+	font-family: 'Lato', Calibri, Arial, sans-serif;
+	background: #2E9AFE;
+}
+
+.container {
+	width: 100%;
+	text-align: center;
+}
+
+.container > div {
+	margin: 1em auto;
+	width: 12em;
+	padding: 0.15em 0;
+}
+
+/* Header color */
+h1 {color: #00ff00;}

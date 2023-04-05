@@ -1,0 +1,126 @@
+/home/pi/RetroPie/roms/snes/Tetris & Dr Mario (E) [!].smc
+
+/opt/retropie/libretrocores/lr-snes9x2010/snes9x2010_libretro.so
+Snes9x 2010
+
+
+/home/pi/RetroPie/roms/snes/Animaniacs (U) [!].smc
+
+/opt/retropie/libretrocores/lr-snes9x2010/snes9x2010_libretro.so
+Snes9x 2010
+
+
+/home/pi/RetroPie/roms/snes/Donkey Kong Country (V1.1) (E).smc
+
+/opt/retropie/libretrocores/lr-snes9x2010/snes9x2010_libretro.so
+Snes9x 2010
+
+
+/home/pi/RetroPie/roms/snes/Teenage Mutant Ninja Turtles IV - Turtles in Time (U) [!].smc
+
+/opt/retropie/libretrocores/lr-snes9x2010/snes9x2010_libretro.so
+Snes9x 2010
+
+
+/home/pi/RetroPie/roms/mastersystem/Sonic the Hedgehog 2 (JUE) [!].bin
+
+/opt/retropie/libretrocores/lr-picodrive/picodrive_libretro.so
+PicoDrive
+
+
+/home/pi/RetroPie/roms/snes/Tetris Attack (U) [!].smc
+
+/opt/retropie/libretrocores/lr-snes9x2010/snes9x2010_libretro.so
+Snes9x 2010
+
+
+/home/pi/RetroPie/roms/mastersystem/Aladdin (E) [!].bin
+
+/opt/retropie/libretrocores/lr-picodrive/picodrive_libretro.so
+PicoDrive
+
+
+/home/pi/RetroPie/roms/snes/Looney Tunes B-Ball (U).smc
+
+/opt/retropie/libretrocores/lr-snes9x2010/snes9x2010_libretro.so
+Snes9x 2010
+
+
+/home/pi/RetroPie/roms/nes/Super Mario Bros (E).nes
+
+/opt/retropie/libretrocores/lr-fceumm/fceumm_libretro.so
+FCEUmm
+
+
+/home/pi/RetroPie/roms/nes/Super Mario Bros 3 (E).nes
+
+/opt/retropie/libretrocores/lr-fceumm/fceumm_libretro.so
+FCEUmm
+
+
+/home/pi/RetroPie/roms/nes/Tetris (U) [!].nes
+
+/opt/retropie/libretrocores/lr-fceumm/fceumm_libretro.so
+FCEUmm
+
+
+/home/pi/RetroPie/roms/nes/Ninja Gaiden (U).nes
+
+/opt/retropie/libretrocores/lr-fceumm/fceumm_libretro.so
+FCEUmm
+
+
+/home/pi/RetroPie/roms/snes/Street Fighter II Turbo (U).smc
+
+/opt/retropie/libretrocores/lr-snes9x2010/snes9x2010_libretro.so
+Snes9x 2010
+
+
+/home/pi/RetroPie/roms/snes/Mega Man X 3 (U).smc
+
+/opt/retropie/libretrocores/lr-snes9x2010/snes9x2010_libretro.so
+Snes9x 2010
+
+
+/home/pi/RetroPie/roms/snes/Paperboy 2 (U) [!].smc
+
+/opt/retropie/libretrocores/lr-snes9x2010/snes9x2010_libretro.so
+Snes9x 2010
+
+
+/home/pi/RetroPie/roms/psx/Diablo (USA) (En,Fr,De,Sv).cue
+
+/opt/retropie/libretrocores/lr-pcsx-rearmed/libretro.so
+PCSX-ReARMed
+
+
+/home/pi/RetroPie/roms/nes/Teenage Mutant Ninja Turtles 2 (U).nes
+
+/opt/retropie/libretrocores/lr-fceumm/fceumm_libretro.so
+FCEUmm
+
+
+/home/pi/RetroPie/roms/snes/Ms. Pac-Man (U).smc
+
+/opt/retropie/libretrocores/lr-snes9x2010/snes9x2010_libretro.so
+Snes9x 2010
+
+
+/home/pi/RetroPie/roms/nes/Bubble Bobble (U).nes
+
+/opt/retropie/libretrocores/lr-fceumm/fceumm_libretro.so
+FCEUmm
+
+
+/home/pi/RetroPie/roms/psx/Need for Speed - High Stakes (USA).cue
+
+/opt/retropie/libretrocores/lr-pcsx-rearmed/libretro.so
+PCSX-ReARMed
+
+
+/home/pi/RetroPie/roms/psx/WarCraft II - The Dark Saga (USA) (En,Fr,De,Es,It).cue
+
+/opt/retropie/libretrocores/lr-pcsx-rearmed/libretro.so
+PCSX-ReARMed
+
+
