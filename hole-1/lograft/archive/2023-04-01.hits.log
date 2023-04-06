@@ -1,0 +1,15 @@
+Apr  1 11:32:36 dnsmasq[168]: query[A] www.bellesa.co from 10.1.1.92
+Apr  1 11:32:36 dnsmasq[168]: query[AAAA] www.bellesa.co from 10.1.1.92
+Apr  1 11:32:36 dnsmasq[168]: query[HTTPS] www.bellesa.co from 10.1.1.92
+Apr  1 11:32:36 dnsmasq[168]: query[A] i.bellesa.co from 10.1.1.92
+Apr  1 11:32:36 dnsmasq[168]: query[AAAA] i.bellesa.co from 10.1.1.92
+Apr  1 11:32:36 dnsmasq[168]: query[HTTPS] i.bellesa.co from 10.1.1.92
+Apr  1 11:32:36 dnsmasq[168]: query[A] c.bellesa.co from 10.1.1.92
+Apr  1 11:32:36 dnsmasq[168]: query[AAAA] c.bellesa.co from 10.1.1.92
+Apr  1 11:32:36 dnsmasq[168]: query[HTTPS] c.bellesa.co from 10.1.1.92
+Apr  1 11:32:37 dnsmasq[168]: query[A] static.klaviyo.com from 10.1.1.92
+Apr  1 11:32:37 dnsmasq[168]: query[AAAA] static.klaviyo.com from 10.1.1.92
+Apr  1 11:32:37 dnsmasq[168]: query[HTTPS] static.klaviyo.com from 10.1.1.92
+Apr  1 11:32:38 dnsmasq[168]: query[A] s.bellesa.co from 10.1.1.92
+Apr  1 11:32:38 dnsmasq[168]: query[AAAA] s.bellesa.co from 10.1.1.92
+Apr  1 11:32:38 dnsmasq[168]: query[HTTPS] s.bellesa.co from 10.1.1.92

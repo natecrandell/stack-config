@@ -1,0 +1,9 @@
+Apr  2 08:34:24 dnsmasq[221364]: query[A] static.klaviyo.com from 10.1.1.92
+Apr  2 08:34:24 dnsmasq[221364]: query[AAAA] static.klaviyo.com from 10.1.1.92
+Apr  2 08:34:24 dnsmasq[221364]: query[HTTPS] static.klaviyo.com from 10.1.1.92
+Apr  2 08:35:54 dnsmasq[221364]: query[A] static.klaviyo.com from 10.1.1.92
+Apr  2 08:35:54 dnsmasq[221364]: query[AAAA] static.klaviyo.com from 10.1.1.92
+Apr  2 08:35:54 dnsmasq[221364]: query[HTTPS] static.klaviyo.com from 10.1.1.92
+Apr  2 08:39:32 dnsmasq[221364]: query[A] static.klaviyo.com from 10.1.1.92
+Apr  2 08:39:32 dnsmasq[221364]: query[AAAA] static.klaviyo.com from 10.1.1.92
+Apr  2 08:39:32 dnsmasq[221364]: query[HTTPS] static.klaviyo.com from 10.1.1.92

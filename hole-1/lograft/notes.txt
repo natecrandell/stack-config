@@ -1,0 +1,21 @@
+# Untargeted
+  # IPs with hits
+    cat logs/* | grep "$(cat hit.list)" | grep -v "$(cat safe.list)" | cut -d: -f4- | cut -d' ' -f3- | grep ' from ' | cut -d' ' -f3 | sort | uniq
+
+# Targeted IP
+  # Hits
+    cat logs/* | grep "10.1.1.92" | grep "$(cat hit.list)"
+
+  # All TLDs
+    cat logs/* | grep "10.1.1.92" | cut -d: -f4- | cut -d' ' -f3- | rev | cut -d' ' -f3- | cut -d. -f1-2 | rev | sort | uniq -c
+
+  # All TLDs - less idle.list
+    cat logs/* | grep "10.1.1.92" | cut -d: -f4- | cut -d' ' -f3- | grep -v "$(cat idle.list)" | rev | cut -d' ' -f3- |
+cut -d. -f1-2 | rev | sort | uniq -c
+
+  # All TLDs - less remove.list
+    cat logs/* | grep "10.1.1.92" | grep -v "$(cat remove.list)" | cut -d: -f4- | cut -d' ' -f3- | rev | cut -d' ' -f3- | cut -d. -f1-2 | rev | sort | uniq -c
+
+# Generate idle.list
+  grep 10.1.1.92 logs/pihole.log* | awk '{print $3" "$4" "$5" "$6" "$7" "$8" "$9" "$10" "$11}' | egrep ^0[0-5] | cut -d' ' -f4 | sort | uniq | grep -v "1.1." | sed 's/$/\\/g' | tr '\n' '\|' | rev | cut -d\\ -f2- | rev > idle.list
+
