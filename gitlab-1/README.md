@@ -121,9 +121,10 @@ git push -u origin --tags
 ---     IdentityFile /root/.ssh/id_ed25519
 - Add public SSH key to project
 
-## I always have a hard time finding Deploy Keys
+## Stuff I can never find in the Gitlab UI
 
-click git-lab icon in upper left -> click on project -> settings icon (left, JUST HOVER) -> REPOSITORY -> Deploy Keys
+- Deploy Keys - click git-lab icon in upper left -> click on repo (inside project) -> settings icon (left, JUST HOVER) -> REPOSITORY -> Deploy Keys
+- Disable Autodevops - In the project, click settings -> General -> Permissions (Expand) -> Pipelines (Toggle switch)
 
 ## Gitlab Container Registry
 
@@ -133,4 +134,30 @@ I followed [this guide](https://juju.is/tutorials/using-gitlab-as-a-container-re
 docker login gitlab.crandell.us:5050 -u nate
 docker build -t gitlab.crandell.us:5050/infr/ctr:latest .
 docker push gitlab.crandell.us:5050/infr/ctr
+```
+
+## Gitlab Version Upgrade
+
+`https://docs.gitlab.com/ee/policy/maintenance.html#upgrade-recommendations`
+
+```bash
+apt-get upgrade gitlab-ce=11.11.8-ce.0
+apt-get upgrade gitlab-ce=12.0.12-ce.0 -y && apt-get upgrade gitlab-ce=12.10.14-ce.0 -y && apt-get upgrade gitlab-ce=13.0.12-ce.0 -y && apt-get upgrade gitlab-ce -y
+gitlab-ctl restart
+```
+
+```text
+Upgrade complete! If your GitLab server is misbehaving try running
+  sudo gitlab-ctl restart
+before anything else.
+If you need to roll back to the previous version you can use the database
+backup made during the upgrade (scroll up for the filename).
+```
+
+## Gitlab Repo Update
+
+`https://about.gitlab.com/upgrade-to-package-repository/`
+
+```bash
+curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | sudo bash
 ```
