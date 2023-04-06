@@ -1,0 +1,249 @@
+# Configure Kubernetes master on Raspberry Pi 4 running Ubuntu Server 22.04 LTS
+	# Pre-reqs: Complete the bootstrapping detailed in another file in this dir.
+	# Sources:
+	 - https://www.armosec.io/blog/setting-up-kubernetes-cluster/
+     - https://computingforgeeks.com/install-kubernetes-cluster-ubuntu-jammy/
+
+# Pre-flight checks:
+	# Ensure hostname and hostname -f resolve properly:
+		hostname && hostname -f
+	# Ensure swap is disabled
+		sudo swapoff -a
+		sudo vim /etc/fstab
+			#/swap.img
+		sudo mount -a
+		free -m
+
+# Enable kernel modules
+	# The vxlan kernel module is required for Flannel, but is not currently available by default for Pi.
+	sudo apt install -y linux-modules-extra-raspi
+	
+	sudo modprobe br_netfilter overlay vxlan
+	sudo tee /etc/modules-load.d/k8s.conf <<EOF
+		overlay
+		br_netfilter
+		vxlan
+		EOF
+
+# Add some settings to sysctl
+	sudo tee /etc/sysctl.d/kubernetes.conf<<EOF
+		net.bridge.bridge-nf-call-ip6tables = 1
+		net.bridge.bridge-nf-call-iptables = 1
+		net.ipv4.ip_forward = 1
+		EOF
+
+	sudo sysctl -p
+	
+# Install some preferred tools
+	sudo apt install apt-transport-https ca-certificates curl gnupg2 lsb-release jq
+
+# Install kubelet, kubeadm and kubectl
+	sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+	# I don't know why the following specifies 'xenial', but it appears to be valid.
+	echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+	
+	# As of 2022-12 the current k8s version is 1.26.0, but this version isn't working for reasons I don't yet understand.
+	sudo apt update
+	# sudo apt install kubelet kubeadm kubectl
+	sudo apt install kubelet=1.25.5-00 kubeadm=1.25.5-00 kubectl=1.25.5-00
+	sudo apt-mark hold kubelet kubeadm kubectl
+	
+	# At this point kubelet always fails. This isn't a problem, as kubeadm commands will configure and run kubelet as needed for init/join commands. Just stop the kubelet service for now.
+	sudo systemctl stop kubelet
+	
+
+# Install and configure Docker as container runtime
+	# Note: run as unprivileged user
+	# Install Docker		# Also referenced https://docs.docker.com/engine/install/ubuntu/
+		curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+		echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+		sudo apt update && sudo apt install docker-ce docker-ce-cli containerd.io
+		sudo mkdir -p /etc/systemd/system/docker.service.d
+
+	# Update the default Docker daemon
+		echo '{"exec-opts":["native.cgroupdriver=systemd"],"log-driver":"json-file","log-opts":{"max-size":"100m"},"storage-driver":"overlay2"}' | jq -r | sudo tee /etc/docker/daemon.json
+
+		sudo systemctl enable docker && sudo systemctl daemon-reload && sudo systemctl restart docker
+		sudo systemctl status docker
+
+	# Enable Docker access from non-root user-space
+		sudo usermod -aG docker $USER
+		# Log out and back in so that your group membership is reevaluated
+		docker ps		# Verify
+
+# Install & configure cri-dockerd as docker engine shim
+	# Reference
+		- main: https://computingforgeeks.com/install-mirantis-cri-dockerd-as-docker-engine-shim-for-kubernetes/
+		- also:
+			- https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker
+			- https://github.com/Mirantis/cri-dockerd#to-use-with-kubernetes
+	
+	VER=$(curl -s https://api.github.com/repos/Mirantis/cri-dockerd/releases/latest|grep tag_name | cut -d'"' -f4 | sed 's/v//g') && wget https://github.com/Mirantis/cri-dockerd/releases/download/v${VER}/cri-dockerd-${VER}.$(dpkg --print-architecture).tgz
+	tar xvf cri-dockerd-${VER}.$(dpkg --print-architecture).tgz && sudo mv cri-dockerd/cri-dockerd /usr/local/bin/ && cri-dockerd --version && rm -rf cri-dockerd/ cri-dockerd-*
+	sudo chown root: /usr/local/bin/cri-dockerd
+	sudo wget https://raw.githubusercontent.com/Mirantis/cri-dockerd/master/packaging/systemd/cri-docker.service https://raw.githubusercontent.com/Mirantis/cri-dockerd/master/packaging/systemd/cri-docker.socket && sudo mv cri-docker.socket cri-docker.service /etc/systemd/system/ && sudo sed -i -e 's,/usr/bin/cri-dockerd,/usr/local/bin/cri-dockerd,' /etc/systemd/system/cri-docker.service
+	sudo systemctl daemon-reload && sudo systemctl enable cri-docker.service && sudo systemctl enable --now cri-docker.socket
+	sudo systemctl status cri-docker.socket
+
+	# Useful troubleshooting commands:
+		sudo ctr plugin ls
+		sudo crictl -r unix:///run/cri-dockerd.sock info
+
+# Init cluster
+	sudo kubeadm config images pull --cri-socket unix:///run/cri-dockerd.sock
+	
+	sudo kubeadm init --pod-network-cidr=10.244.0.0/16 --cri-socket unix:///run/cri-dockerd.sock --apiserver-advertise-address=10.1.1.104
+
+	# https://kubernetes.io/blog/2022/11/18/upcoming-changes-in-kubernetes-1-26/#cri-api-removal
+	# The above seems to have worked with v1.25.5-00. In v1.26 the removal of support for CRI v1alpha2 causes kubelet to fail with:
+		[kubelet-check] The HTTP call equal to 'curl -sSL http://localhost:10248/healthz' failed with error: Get "http://localhost:10248/healthz": dial tcp 127.0.0.1:10248: connect: connection refused.
+	# Just noticed that cri-tools=1.25.0-00 was installed as a dependency. 
+		# found latest: https://github.com/kubernetes-sigs/cri-tools/releases/tag/v1.26.0
+		# I think I'm going to give up on k8s 1.26 for now.
+		
+----------------------------------------------------log output
+I1214 13:09:14.293821    8348 version.go:256] remote version is much newer: v1.26.0; falling back to: stable-1.25
+[init] Using Kubernetes version: v1.25.5
+[preflight] Running pre-flight checks
+        [WARNING SystemVerification]: missing optional cgroups: blkio
+[preflight] Pulling images required for setting up a Kubernetes cluster
+[preflight] This might take a minute or two, depending on the speed of your internet connection
+[preflight] You can also perform this action in beforehand using 'kubeadm config images pull'
+[certs] Using certificateDir folder "/etc/kubernetes/pki"
+[certs] Generating "ca" certificate and key
+[certs] Generating "apiserver" certificate and key
+[certs] apiserver serving cert is signed for DNS names [cs-1 kubernetes kubernetes.default kubernetes.default.svc kubernetes.default.svc.cluster.local] and IPs [10.96.0.1 10.1.1.104]
+[certs] Generating "apiserver-kubelet-client" certificate and key
+[certs] Generating "front-proxy-ca" certificate and key
+[certs] Generating "front-proxy-client" certificate and key
+[certs] Generating "etcd/ca" certificate and key
+[certs] Generating "etcd/server" certificate and key
+[certs] etcd/server serving cert is signed for DNS names [cs-1 localhost] and IPs [10.1.1.104 127.0.0.1 ::1]
+[certs] Generating "etcd/peer" certificate and key
+[certs] etcd/peer serving cert is signed for DNS names [cs-1 localhost] and IPs [10.1.1.104 127.0.0.1 ::1]
+[certs] Generating "etcd/healthcheck-client" certificate and key
+[certs] Generating "apiserver-etcd-client" certificate and key
+[certs] Generating "sa" key and public key
+[kubeconfig] Using kubeconfig folder "/etc/kubernetes"
+[kubeconfig] Writing "admin.conf" kubeconfig file
+[kubeconfig] Writing "kubelet.conf" kubeconfig file
+[kubeconfig] Writing "controller-manager.conf" kubeconfig file
+[kubeconfig] Writing "scheduler.conf" kubeconfig file
+[kubelet-start] Writing kubelet environment file with flags to file "/var/lib/kubelet/kubeadm-flags.env"
+[kubelet-start] Writing kubelet configuration to file "/var/lib/kubelet/config.yaml"
+[kubelet-start] Starting the kubelet
+[control-plane] Using manifest folder "/etc/kubernetes/manifests"
+[control-plane] Creating static Pod manifest for "kube-apiserver"
+[control-plane] Creating static Pod manifest for "kube-controller-manager"
+[control-plane] Creating static Pod manifest for "kube-scheduler"
+[etcd] Creating static Pod manifest for local etcd in "/etc/kubernetes/manifests"
+[wait-control-plane] Waiting for the kubelet to boot up the control plane as static Pods from directory "/etc/kubernetes/manifests". This can take up to 4m0s
+[kubelet-check] Initial timeout of 40s passed.
+[apiclient] All control plane components are healthy after 42.507504 seconds
+[upload-config] Storing the configuration used in ConfigMap "kubeadm-config" in the "kube-system" Namespace
+[kubelet] Creating a ConfigMap "kubelet-config" in namespace kube-system with the configuration for the kubelets in the cluster
+[upload-certs] Skipping phase. Please see --upload-certs
+[mark-control-plane] Marking the node cs-1 as control-plane by adding the labels: [node-role.kubernetes.io/control-plane node.kubernetes.io/exclude-from-external-load-balancers]
+[mark-control-plane] Marking the node cs-1 as control-plane by adding the taints [node-role.kubernetes.io/control-plane:NoSchedule]
+[bootstrap-token] Using token: ty4f0b.7vk3gmzohbdh2l4i
+[bootstrap-token] Configuring bootstrap tokens, cluster-info ConfigMap, RBAC Roles
+[bootstrap-token] Configured RBAC rules to allow Node Bootstrap tokens to get nodes
+[bootstrap-token] Configured RBAC rules to allow Node Bootstrap tokens to post CSRs in order for nodes to get long term certificate credentials
+[bootstrap-token] Configured RBAC rules to allow the csrapprover controller automatically approve CSRs from a Node Bootstrap Token
+[bootstrap-token] Configured RBAC rules to allow certificate rotation for all node client certificates in the cluster
+[bootstrap-token] Creating the "cluster-info" ConfigMap in the "kube-public" namespace
+[kubelet-finalize] Updating "/etc/kubernetes/kubelet.conf" to point to a rotatable kubelet client certificate and key
+[addons] Applied essential addon: CoreDNS
+[addons] Applied essential addon: kube-proxy
+
+Your Kubernetes control-plane has initialized successfully!
+
+To start using your cluster, you need to run the following as a regular user:
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+Alternatively, if you are the root user, you can run:
+
+  export KUBECONFIG=/etc/kubernetes/admin.conf
+
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+
+Then you can join any number of worker nodes by running the following on each as root:
+
+kubeadm join 10.1.1.104:6443 --token ty4f0b.7vk3gmzohbdh2l4i \
+        --discovery-token-ca-cert-hash sha256:e82a77a06563a0c608ad86bf4a9f1adcb843aa12e80adbbfee8132d7d4ec5d47
+----------------------------------------------------
+
+# Configure kubectl
+	mkdir -p $HOME/.kube && sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config && sudo chown $(id -u):$(id -g) $HOME/.kube/config
+	mkdir ~/.bashrc.d
+	vim ~/.bashrc.d/mybash
+		HISTSIZE=2000
+		HISTFILESIZE=4000
+		source <(kubectl completion bash)
+		alias k=kubectl
+		complete -F __start_kubectl k
+		alias ll='ls --color=auto -lha'
+		
+	chmod -R 755 ~/.bashrc.d
+
+# Install Flannel as networking plugin
+	# Skip to section: 'Install Kubernetes network plugin' https://computingforgeeks.com/install-kubernetes-cluster-ubuntu-jammy/
+	wget https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
+	kubectl apply -f kube-flannel.yml
+
+# Should now be ready for other nodes to join the cluster.
+
+
+
+
+
+---------------------------------------------------- Important files:
+kubelet
+	- /var/lib/kubelet/kubeadm-flags.env
+		KUBELET_KUBEADM_ARGS="--container-runtime-endpoint=unix:///run/cri-dockerd.sock --pod-infra-container-image=registry.k8s.io/pause:3.9"
+	# From this command:
+		ncrandell@cl-1 ~$ sudo systemctl status kubelet | head -n4 | tail -n2
+			Drop-In: /etc/systemd/system/kubelet.service.d
+					 └─10-kubeadm.conf
+	# I can derive this command, which gives a good exmplanation of the conf workings of kubelet
+		ncrandell@cl-1 ~$ sudo cat /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+		# Note: This dropin only works with kubeadm and kubelet v1.11+
+		[Service]
+		Environment="KUBELET_KUBECONFIG_ARGS=--bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.conf"
+		Environment="KUBELET_CONFIG_ARGS=--config=/var/lib/kubelet/config.yaml"
+		# This is a file that "kubeadm init" and "kubeadm join" generates at runtime, populating the KUBELET_KUBEADM_ARGS variable dynamically
+		EnvironmentFile=-/var/lib/kubelet/kubeadm-flags.env
+		# This is a file that the user can use for overrides of the kubelet args as a last resort. Preferably, the user should use
+		# the .NodeRegistration.KubeletExtraArgs object in the configuration files instead. KUBELET_EXTRA_ARGS should be sourced from this file.
+		EnvironmentFile=-/etc/default/kubelet
+		ExecStart=
+		ExecStart=/usr/bin/kubelet $KUBELET_KUBECONFIG_ARGS $KUBELET_CONFIG_ARGS $KUBELET_KUBEADM_ARGS $KUBELET_EXTRA_ARGS
+---------------------------------------------------- Do a full docker/k8s reinstall
+sudo -i
+systemctl stop cri-docker docker
+apt purge kubelet kubeadm kubectl kubernetes-cni docker-ce docker-ce-cli containerd.io docker-compose-plugin
+apt autoremove -y
+rm -rf /var/lib/docker /var/lib/containerd /etc/kubernetes /opt/containerd /etc/containerd /etc/docker /usr/local/bin/cri-dockerd /etc/systemd/system/cri-docker.* /run/docker /run/docker.sock /run/containerd /run/cri-dockerd.sock ~/.kube /var/lib/etcd /var/lib/cni /var/lib/kubelet
+systemctl daemon-reload && reboot
+---------------------------------------------------- Reset iptables (troubleshooting only)
+sudo iptables -F && sudo iptables -t nat -F && sudo iptables -t mangle -F && sudo iptables -X
+---------------------------------------------------- Notes from dead-ends
+# Attempting to configure networking: Calico via Helm 3
+	# Install Helm 3		https://helm.sh/docs/intro/install/#from-apt-debianubuntu
+	curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
+	echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+	sudo apt-get update && sudo apt-get install helm
+	
+	# Install Calico		https://projectcalico.docs.tigera.io/getting-started/kubernetes/helm
+	helm repo add projectcalico https://projectcalico.docs.tigera.io/charts
+#### I missed steps here
+	
+	# Install calicoctl		https://projectcalico.docs.tigera.io/maintenance/clis/calicoctl/install#tab-tabplugin-104
+	cd /usr/local/bin
+	sudo curl -L https://github.com/projectcalico/calico/releases/download/v3.24.5/calicoctl-linux-arm64 -o calicoctl
+	sudo chmod +x calicoctl

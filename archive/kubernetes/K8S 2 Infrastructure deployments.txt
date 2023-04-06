@@ -1,0 +1,34 @@
+# Add cluster nodes
+
+# On worker nodes, follow all config instructions as outlined in 'K8S 1 Master config - RPi4 Ubuntu.txt' up to the 'Init cluster' section.
+
+# Be sure to add --cri-socket to the join command
+sudo kubeadm join 10.1.1.104:6443 --token bzvvay.gg56ogf9dv4u7tnn --discovery-token-ca-cert-hash sha256:5d84113253b6ff7f6fd66bddbe1b6458c800644157d38af8e643cc0f03d4b6ff --cri-socket unix:///run/cri-dockerd.sock
+
+# If this doesn't work, try:
+	# Run join command again, but increase verbosity by adding to the end: --v=5
+	# If seeing error: The cluster-info ConfigMap does not yet contain a JWS signature for token ID...
+		# On master run: kubeadm token list
+		# If there are no tokens listed, create one: kubeadm token create; kubeadm token list
+		# Note that tokens expire. Use the new token in the join command.
+
+
+
+
+
+
+# Install Kubernetes Dashboard
+	# https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/
+	# https://adamtheautomator.com/kubernetes-dashboard/
+	# Determine latest release version at https://github.com/kubernetes/dashboard/releases/
+	kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/$(curl -s https://api.github.com/repos/kubernetes/dashboard/releases/latest | jq -r '.tag_name')/aio/deploy/recommended.yaml
+	kubectl edit service/kubernetes-dashboard -n kubernetes-dashboard
+		# Change spec.type: ClusterIP -> spec.type: NodePort
+	k delete po kubernetes-dashboard-5c8bd6b59-sv8rs -n kubernetes-dashboard
+	# Verify change to NodePort
+	k get svc -A
+	k create serviceaccount dashboard -n kubernetes-dashboard
+	k create token dashboard -n kubernetes-dashboard
+	# Go to https://cl-1.crandell.us:31968/3/login and enter the token output from above command
+	k get secret $(kubectl get serviceaccount dashboard -o jsonpath="{.secrets[0].name}") -o jsonpath="{.data.token}" | base64 --decode
+	# I do not understand their auth mechanism here.

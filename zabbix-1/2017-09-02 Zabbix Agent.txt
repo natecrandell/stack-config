@@ -1,0 +1,156 @@
+#Install Zabbix agent on Windows host
+#https://www.zabbix.com/documentation/2.0/manual/appendix/install/windows_agent
+
+# Download the windows agent here:
+# https://www.zabbix.com/download_agents
+# https://www.zabbix.com/downloads/3.4.6/zabbix_agents_3.4.6.win.zip
+
+#Put \bin\win64\zabbix_agentd.exe and \conf\zabbix_agentd.win.conf in C:\zabbix
+#Edit the conf file with relevant info using notepad++
+#Here is a copy of entered parameters in the conf file for DEXNET-SERVER:
+LogType=file
+LogFile=c:\zabbix\zabbix_agentd.log
+LogFileSize=1
+DebugLevel=3
+EnableRemoteCommands=1
+LogRemoteCommands=1
+Server=10.1.1.217
+ListenPort=10050
+Hostname=DEXNET-SERVER
+RefreshActiveChecks=120
+BufferSend=5
+
+#In and elevated command line, run:
+C:\zabbix\zabbix_agentd.exe --start
+C:\zabbix\zabbix_agentd.exe --config c:\zabbix\zabbix_agentd.win.conf --install
+
+
+# I created C:\Users\DexNet\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\zabbix.bat with the following contents:
+@echo off
+c:\zabbix\zabbix_agentd.exe --start
+
+
+#Install agent on a Linux machine
+#Figure out what repo you need to add
+#Get the release version:		Ubuntu: lsb_release -a		CentOS: cat /etc/*elease
+#https://www.zabbix.com/documentation/3.2/manual/installation/install_from_packages
+#http://repo.zabbix.com/zabbix/3.2/
+
+#Add the repository & install zabbix agent
+	#Debian 9
+		#2017-08-17 Gives an error: Depends: libssl1.0.0 (>= 1.0.1) but it is not installable
+		#Zabbix team is working on Debian 9 repo https://support.zabbix.com/browse/ZBXNEXT-3948
+	#Debian 7
+		wget http://repo.zabbix.com/zabbix/3.2/debian/pool/main/z/zabbix-release/zabbix-release_3.2-1+wheezy_all.deb
+		dpkg -i zabbix-release_3.2-1+wheezy_all.deb
+	#Ubuntu 16.04
+		wget -P /home/nate http://repo.zabbix.com/zabbix/3.4/ubuntu/pool/main/z/zabbix-release/zabbix-release_3.4-1+xenial_all.deb
+		dpkg -i /home/nate/zabbix-release_3.4-1+xenial_all.deb
+		apt-get update && apt-get install zabbix-agent
+		rm /home/nate/zabbix-release_3.4-1+xenial_all.deb
+
+	#CentOS 6.5:
+	rpm -ivh http://repo.zabbix.com/zabbix/3.2/rhel/6/x86_64/zabbix-release-3.2-1.el6.noarch.rpm
+	yum update && yum install zabbix-agent
+	rm *.rpm
+
+#Configuration
+	mv /etc/zabbix/zabbix_agentd.conf /etc/zabbix/zabbix_agentd.conf.bak
+	vim /etc/zabbix/zabbix_agentd.conf
+	PidFile=/var/run/zabbix/zabbix_agentd.pid
+	LogType=file
+	LogFile=/var/log/zabbix/zabbix_agentd.log
+	LogFileSize=1
+	DebugLevel=3
+	EnableRemoteCommands=1
+	LogRemoteCommands=1
+	Server=zabbix.snaptek.us,10.1.1.17,127.0.0.1
+
+
+#For the zabbix-agent on the zabbix-server, use Server=127.0.0.1 & Hostname=localhost
+systemctl enable zabbix-agent
+systemctl start zabbix-agent
+
+
+
+
+
+
+
+
+
+#Monitor a printer
+#https://www.zabbix.com/documentation/3.0/manual/config/items/itemtypes/snmp
+#http://askubuntu.com/questions/562526/snmpwalk-of-does-not-display-textual-oid
+#Create a host
+#Add the IP address to the SNMP section
+#In the commandline on zabbix machine:
+apt-get install snmp snmp-mibs-downloader
+#For CentOS - yum -y install net-snmp net-snmp-utils
+
+#2017-06-05 I think this next step was causing problems getting SNMP data, so I reversed it.
+vim /etc/snmp/snmp.conf
+#Comment out mibs :
+
+
+vim /etc/snmp/snmpd.conf
+#Comment out
+view   systemonly  included   .1.3.6.1.2.1.25.1
+#Add line:
+view systemonly included .1.3.6.1.2.1.25
+
+#This will give you a list of snmp strings and their value for the printer
+snmpwalk -v 2c -c public 10.1.1.40
+
+#This is how you get the OID for a given string:
+snmpget -v 2c -c public -On 10.1.1.40 IF-MIB::ifOperStatus.1
+
+#Use the OID
+
+IF-MIB::ifOperStatus.1
+IF-MIB::ifOutOctets.1
+IF-MIB::ifInOctets.1
+IF-MIB::ifOutQLen.1
+HOST-RESOURCES-MIB::hrSystemUptime.0
+IF-MIB::ifHCInOctets.1
+IF-MIB::ifHCOutOctets.1
+IF-MIB::ifHighSpeed.1
+
+
+
+
+
+#List of Zabbix Item Keys:
+#https://www.zabbix.com/documentation/3.2/manual/config/items/itemtypes/zabbix_agent
+
+
+
+
+
+
+
+***************************See bottom comment
+#Install Network Services Monitor custom script
+#https://zabbix.tips/monitor-services-automatically/
+#https://share.zabbix.com/operating-systems/monitor-network-services-automatically
+apt-get install nmap
+cat > /usr/lib/zabbix/externalscripts/tcp-discovery.sh
+#!/bin/bash
+usage(){ echo "Usage: ./$(basename $0) hostname. For example: ./$(basename $0) server1.example.com";}
+if [ -z $1 ]; then usage; exit 1; fi
+IFS=$'\n'
+LIST=$(nmap -T5 -F ${1} | grep 'open')
+echo -n '{"data":['
+for s in $LIST; do
+        PORT=$(echo $s | cut -d/ -f1)
+        PROTO=$(echo $s | cut -d/ -f2 | awk '{sub(/[[:space:]].*/,""); print}')
+        SERVICE=$(echo $s | awk '{print $3}')
+        echo -n '{"{#PORT}":"'${PORT}'","{#PROTO}":"'${PROTO}'","{#SERVICE}":"'${SERVICE}'"},'
+done |sed -e 's:\},$:\}:'
+echo -n ']}'
+unset IFS
+
+
+chmod +x /usr/lib/zabbix/externalscripts/tcp-discovery.sh
+#Import template (Configuration->Templates->Import) and assign it to your hosts.
+#2017-07-05 I can't get this to work. I don't know what to do at this point.

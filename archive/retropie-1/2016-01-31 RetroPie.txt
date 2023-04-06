@@ -1,0 +1,19 @@
+#Change what gaming systems show up in emulationstation menu
+#https://github.com/RetroPie/RetroPie-Setup/wiki/emulationstation
+nano /etc/emulationstation/es_systems.cfg
+#Comment out platforms with <!-- and -->
+
+
+
+#Update system using git
+#https://github.com/Aloshi/EmulationStation/issues/67#issuecomment-16715011
+
+#Remove unneeded services
+#http://www.hiscorebob.lu/2014/05/retropie-tips-n-tricks/#services
+apt-get purge cups
+
+#Clear up some space by removing Raspbian update packages that are already installed:
+cd /var/cache/apt/archives
+rm -rf *.deb
+
+rm -rf dreamcast apple2 amiga atari2600 atari5200 atari7800 atari800  atarilynx atarist

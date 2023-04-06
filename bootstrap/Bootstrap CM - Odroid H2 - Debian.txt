@@ -1,0 +1,39 @@
+# Install Debian 10 64-bit netinst (https://www.debian.org/distrib/), flashed to USB with Etcher
+
+# The installation was pretty painful.
+	- Ignore anything about non-free firmware
+	- Don't remove the USB installation disk until it says you can
+	- Partitions: 25G /, 10G /var, 2G /tmp, the rest unallocated
+
+apt-get install -y salt-minion vim sudo gnupg2
+
+rm -rf /etc/salt/minion; vim /etc/salt/minion
+	master: 10.1.1.231
+	id: cm-1
+	
+service salt-minion restart
+
+
+# On salt master - accept key, and
+salt cm-1 state.sls common.ssh,common.users,common.pkgs
+
+# Can SSH now
+
+# Configure network
+vim /etc/network/interfaces
+	source /etc/network/interfaces.d/*
+
+	auto lo
+	iface lo inet loopback
+
+	allow-hotplug enp2s0
+	iface enp2s0 inet static
+		address 10.1.1.101/24
+		gateway 10.1.1.1
+		dns-nameservers 10.1.1.214 10.1.1.1
+		dns-domain crandell.us
+		dns-search crandell.us
+	iface enp2s0 inet6 auto
+	#iface enp3s0 inet manual
+
+apt-get update && apt-get dist-upgrade -y && reboot

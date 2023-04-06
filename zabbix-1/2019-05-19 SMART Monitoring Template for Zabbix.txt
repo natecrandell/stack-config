@@ -1,0 +1,22 @@
+# SMART Monitoring Template for Zabbix
+# https://github.com/v-zhuravlev/zbx-smartctl
+
+visudo 
+
+Cmnd_Alias SMARTCTL = /usr/sbin/smartctl
+Cmnd_Alias SMARTCTL_DISCOVERY = /etc/zabbix/scripts/smartctl-disks-discovery.pl
+zabbix ALL= (ALL) NOPASSWD: SMARTCTL, SMARTCTL_DISCOVERY
+Defaults!SMARTCTL !logfile, !syslog, !pam_session
+Defaults!SMARTCTL_DISCOVERY !logfile, !syslog, !pam_session
+
+
+cd
+git clone https://github.com/v-zhuravlev/zbx-smartctl.git
+cd zbx-smartctl/
+cp zabbix_smartctl.conf /etc/zabbix/zabbix_agentd.d/
+mkdir /etc/zabbix/scripts
+cp ./discovery-scripts/nix/smartctl-disks-discovery.pl /etc/zabbix/scripts/
+chown zabbix:zabbix /etc/zabbix/scripts/smartctl-disks-discovery.pl
+chmod u+x /etc/zabbix/scripts/smartctl-disks-discovery.pl
+/etc/zabbix/scripts/smartctl-disks-discovery.pl
+service zabbix-agent restart

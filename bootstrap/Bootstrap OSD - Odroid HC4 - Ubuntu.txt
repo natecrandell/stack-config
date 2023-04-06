@@ -1,0 +1,44 @@
+# Install Ubuntu 20.04 for Odroid https://wiki.odroid.com/odroid-hc4/os_images/ubuntu), flashed to USB with Etcher
+# https://odroid.in/ubuntu_20.04lts/c4-hc4/
+
+# Install salt-minion
+curl -L https://bootstrap.saltstack.com -o install_salt.sh
+chmod +x install_salt.sh
+./install_salt.sh -P
+vi /etc/salt/minion
+	master: 10.1.1.231
+	id: osd-a
+
+service salt-minion restart
+
+# On salt master - accept key, and
+salt osd-a state.sls state.highstate
+
+# Can SSH now
+
+# Configure network
+vim /etc/netplan/01-netcfg.yaml
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eth0:
+      dhcp4: no
+      addresses: [10.1.1.122/24]
+      gateway4: 10.1.1.1
+      nameservers:
+        addresses: [10.1.1.214, 10.1.1.1]
+        search: [crandell.us]
+
+# Install zabbix-agent. I just ended up using the v4 version available to avoid the trusted source bullshit
+apt-get install -y zabbix-agent 
+vim /etc/zabbix/zabbix_agentd.conf
+LogFileSize=1
+EnableRemoteCommands=1
+LogRemoteCommands=1
+Server=10.1.1.217,zabbix-1.crandell.us
+ServerActive=10.1.1.217
+HostMetadataItem=system.uname
+
+hostnamectl set-hostname osd-a
+apt-get update && apt-get autoremove -y && apt-get dist-upgrade -y && reboot

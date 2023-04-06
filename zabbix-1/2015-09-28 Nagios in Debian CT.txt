@@ -1,0 +1,285 @@
+#https://www.digitalocean.com/community/tutorials/how-to-install-nagios-4-and-monitor-your-servers-on-ubuntu-14-04
+#Start with Debian 8 CT
+
+apt-get update && apt-get install sudo snmp mrtg
+#"MRTG only readable by root?" I entered no this time.
+
+adduser nate
+gpasswd -a nate sudo
+
+#Log out and log back in as nate
+sudo -i
+
+#Get the non-free debian package snmp-mibs-downloader
+nano /etc/apt/sources.list
+#Add non-free to the end of the first line
+apt-get update && apt-get install snmp-mibs-downloader
+nano /etc/apt/sources.list
+#Remove non-free
+
+#Install LAMP stack
+#https://www.digitalocean.com/community/tutorials/how-to-install-linux-apache-mysql-php-lamp-stack-on-debian
+apt-get update && apt-get upgrade && apt-get install apache2 mysql-server php5 php-pear php5-mysql curl unzip
+mysql_secure_installation
+cp /usr/share/zoneinfo/America/Denver /etc/localtime
+
+nano /root/.bashrc
+#Uncomment the following lines:
+export LS_OPTIONS='--color=auto'
+eval "`dircolors`"
+alias ls='ls $LS_OPTIONS'
+cd /root
+. .bashrc
+
+
+#Install Nagios
+useradd nagios
+groupadd nagcmd
+usermod -a -G nagcmd nagios
+
+#Build Dependencies
+apt-get install build-essential libgd2-xpm-dev openssl libssl-dev xinetd apache2-utils
+cd ~
+curl -L -O https://assets.nagios.com/downloads/nagioscore/releases/nagios-4.1.1.tar.gz
+tar xvf nagios-*.tar.gz
+cd nagios-*
+./configure --with-nagios-group=nagios --with-command-group=nagcmd
+make all
+make install
+make install-commandmode
+make install-init
+make install-config
+/usr/bin/install -c -m 644 sample-config/httpd.conf /etc/apache2/sites-available/nagios.conf
+usermod -G nagcmd www-data
+
+#Install Nagios Plugins
+cd ~
+curl -L -O http://nagios-plugins.org/download/nagios-plugins-2.1.1.tar.gz
+tar xvf nagios-plugins-*.tar.gz
+cd nagios-plugins-*
+./configure --with-nagios-user=nagios --with-nagios-group=nagios --with-openssl
+make
+make install
+
+#Install NRPE
+cd ~
+curl -L -O http://downloads.sourceforge.net/project/nagios/nrpe-2.x/nrpe-2.15/nrpe-2.15.tar.gz
+tar xvf nrpe-*.tar.gz
+cd nrpe-*
+./configure --with-ssl=/usr/bin/openssl --with-ssl-lib=/usr/lib/x86_64-linux-gnu
+make all
+make install
+make install-xinetd
+make install-daemon-config
+
+nano /etc/xinetd.d/nrpe
+#Add the IP address of the VM after 127.0.0.1
+service xinetd restart
+
+
+#Configure Nagios
+nano /usr/local/nagios/etc/nagios.cfg
+#Now find an uncomment this line by deleting the #:
+cfg_dir=/usr/local/nagios/etc/servers
+
+
+mkdir /usr/local/nagios/etc/servers
+nano /usr/local/nagios/etc/objects/contacts.cfg
+#Change nagiosadmin to ncrandel both places it appears in this file
+#Enter your email address in place of "nagios@localhost"
+
+nano /usr/local/nagios/etc/objects/commands.cfg
+#Add to end of file:
+define command{
+        command_name check_nrpe
+        command_line $USER1$/check_nrpe -H $HOSTADDRESS$ -c $ARG1$
+}
+
+#Configure Apache
+a2enmod rewrite
+a2enmod cgi
+
+htpasswd -c /usr/local/nagios/etc/htpasswd.users ncrandel
+nano /usr/local/nagios/etc/cgi.cfg
+authorized_for_system_information=ncrandel
+authorized_for_configuration_information=ncrandel
+authorized_for_system_commands=ncrandel
+authorized_for_all_services=ncrandel
+authorized_for_all_hosts=ncrandel
+authorized_for_all_service_commands=ncrandel
+authorized_for_all_host_commands=ncrandel
+
+
+ln -s /etc/apache2/sites-available/nagios.conf /etc/apache2/sites-enabled/
+
+service nagios start
+service apache2 restart
+
+#Enable nagios startup on boot
+ln -s /etc/init.d/nagios /etc/rcS.d/S99nagios
+
+nano /etc/apache2/sites-available/nagios.conf
+#Comment these lines:
+Order allow,deny
+Allow from all
+#Uncomment these:
+#  Order deny,allow
+#  Deny from all
+#  Allow from 127.0.0.1
+#These lines appear twice, so repeat the steps again.
+
+#Install Vautour Theme
+#https://exchange.nagios.org/directory/Addons/Frontends-%28GUIs-and-CLIs%29/Web-Interfaces/Themes-and-Skins/Vautour-Style/details
+
+cd ~
+wget http://www.be-root.com/downloads/nagios/vautour/vautour_style.zip
+unzip vautour_style.zip -d /usr/local/nagios/share/
+rm vautour_style.zip
+rm nagios-*
+rm nrpe-*
+
+service nagios restart
+service apache2 restart
+
+
+#Go to http://10.1.10.18/nagios
+
+
+#Configure Windows machine to be monitored
+#https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/3/en/monitoring-windows.html
+
+#Download and install client on windows machine
+#http://sourceforge.net/projects/nscplus
+
+#On Nagios server:
+nano /usr/local/nagios/etc/nagios.cfg
+#Uncomment the following lines:
+#cfg_file=/usr/local/nagios/etc/objects/windows.cfg
+#cfg_file=/usr/local/nagios/etc/objects/switch.cfg
+#cfg_file=/usr/local/nagios/etc/objects/printer.cfg
+
+
+nano /usr/local/nagios/etc/objects/windows.cfg
+#I used hostname DEXNET-SERVER
+#Delete the entire W3SVC section
+#IP 10.1.10.11
+#Change "Explorer.exe" to "explorer.exe"
+
+#Update the password information
+nano /usr/local/nagios/etc/objects/commands.cfg
+#modify this line:
+command_line    $USER1$/check_nt -H $HOSTADDRESS$ -p 12489 -v $ARG1$ $ARG2$
+#To say this:
+command_line	$USER1$/check_nt -H $HOSTADDRESS$ -p 12489 -s <PASSWORD> -v $ARG1$ $ARG2$
+#10/18/15 Password used = frAQBc8Wsa1xVPfv
+
+#Configure monitoring of router
+#https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/3/en/monitoring-routers.html
+nano /usr/local/nagios/etc/objects/switch.cfg
+
+#Configure monitoring of Brother MFC-9340CDW
+#https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/4/en/monitoring-printers.html
+nano /usr/local/nagios/etc/objects/printer.cfg
+#I used hostname Brother_MFC-9340
+
+#Check your config
+/usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
+
+#Restart Nagios
+/etc/init.d/nagios reload
+
+
+#Monitor local Linux CTs & VMs
+#On local VM or CT (Debian/Ubuntu):
+apt-get install nagios-plugins nagios-nrpe-server
+
+#On local VM or CT (CentOS):
+rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
+yum -y install nagios nagios-plugins-all nrpe
+chkconfig nrpe on
+
+
+#Lookup the name of your root filesystem
+df -h /
+nano /etc/nagios/nrpe.cfg
+#Modify the following lines to appear like this:
+server_address=10.1.10.18
+allowed_hosts=127.0.0.1,10.1.10.0/24
+command[check_hda1]=/usr/lib/nagios/plugins/check_disk -w 20% -c 10% -p /dev/loop2
+
+service nagios-nrpe-server restart
+
+#On Nagios server:
+cat >> /usr/local/nagios/etc/servers/nginxproxy.cfg << EOF
+define host {
+        use                             linux-server
+        host_name                       nginxproxy
+        alias                           Nginx Proxy Server
+        address                         10.1.10.14
+        max_check_attempts              5
+        check_period                    24x7
+        notification_interval           30
+        notification_period             24x7
+}
+
+define service {
+        use                             generic-service
+        host_name                       nginxproxy
+        service_description             PING
+        check_command                   check_ping!100.0,20%!500.0,60%
+}
+
+define service {
+        use                             generic-service
+        host_name                       nginxproxy
+        service_description             SSH
+        check_command                   check_ssh
+        notifications_enabled           1
+}
+EOF
+service nagios reload
+
+
+#Configure passive monitoring of remote network (RSI):
+#https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/3/en/passivechecks.html
+#http://marcelo-olivas.blogspot.com/2011/07/automation-monitor-with-nagios-and.html
+
+#On the Nagios server:
+nano /usr/local/nagios/etc/nagios.cfg
+#make sure:
+accept_passive_service_checks=1
+check_external_commands=1
+
+nano /usr/local/nagios/etc/objects/localhost.cfg
+#Add to the end of the file:
+define service{
+       use                             local-service         ; Name of service template to use
+       host_name                       localhost
+       service_description             asynch_client_files
+       check_command                   check_ssh
+       notifications_enabled           0
+       active_checks_enabled           0
+       passive_checks_enabled          1
+}
+
+service nagios restart
+echo '[1445285947] PROCESS_SERVICE_CHECK_RESULT;localhost;asynch_client_files;0;The security master is up to date' > /usr/local/nagios/var/rw/nagios.cmd
+
+
+
+
+
+
+
+
+
+************************************************************************************Unable to open MRTG log file
+#https://www.howtoforge.com/community/threads/check_mrtgtraf-unable-to-open-mrtg-log-file.48484/
+cfgmaker --global 'WorkDir: /var/www/html/mymrtg' --global 'Options[_]: bits,growright' --output /var/log/mrtg/10.1.10.1.log public@10.1.10.1
+mkdir /var/www/html/mymrtg
+env LANG=C /usr/bin/mrtg /etc/mrtg.cfg
+
+Still doesn't seem to be working.
+
+./check_snmp -t 4 -H 10.1.10.1 -C XXX -o sysUpTime.0

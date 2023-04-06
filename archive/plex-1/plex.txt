@@ -1,0 +1,54 @@
+# Install plex as docker container
+
+
+# Actually, I'm just going to do it in LXC first. I'm not sure it'll even meet my needs.
+# Create new privileged Debian 10 CT. No NIC2, or glusterfs-client needed
+
+mkdir /mnt/videos
+apt-get update && apt-get install sudo beignet-opencl-icd vim -y && apt-get dist-upgrade -y && poweroff
+
+# manually enter mount point config on pve host:
+vim /etc/pve/lxc/237.conf
+mp0: /mnt/pve/gvol-misc/libraries/videos,mp=/mnt/videos
+# start CT
+
+# Configure users via salt
+apt-get install salt-minion -y
+# After accepting salt-key, run these:
+salt plex-1 state.sls common.users,common.ssh
+
+# https://support.plex.tv/articles/200288586-installation/
+wget https://downloads.plex.tv/plex-media-server-new/1.21.1.3876-3c3adfcb4/debian/plexmediaserver_1.21.1.3876-3c3adfcb4_amd64.deb
+dpkg -i plexmediaserver_1.21.1.3876-3c3adfcb4_amd64.deb
+
+
+PlexMediaServer install: 
+Now installing based on:
+  Installation Type:   New
+  Process Control:     systemd
+  Plex User:           plex
+  Plex Group:          plex
+  Video Group:         video
+  Metadata Dir:        /var/lib/plexmediaserver/Library/Application Support
+  Temp Directory:      /tmp 
+  Lang Encoding:       en_US.UTF-8
+  Intel QSV Hardware:  Not found
+
+WARNING: The OpenCL library, required for hardware transcoding of HDR content, is missing.
+         Please install package:  'ocl-icd-libopencl1'
+ 
+Completing final configuration.
+Created symlink /etc/systemd/system/multi-user.target.wants/plexmediaserver.service -> /lib/systemd/system/plexmediaserver.service.
+PlexMediaServer-1.21.1.3876-3c3adfcb4 - Installation successful.  Errors: 0, Warnings: 2
+
+# Create croup crandell, gid 1110
+usermod -a -G crandell plex
+
+# It looks like I want to change 'Video Group' to crandell
+
+
+# Browse to 10.1.1.237:32400/web
+
+# It doesn't look like you can leverage hardware acceleration in a container very easily. That's a bullshit.
+# https://www.reddit.com/r/Proxmox/comments/knw6th/intel_quick_sync_passthrough_to_container_0/
+# It appears easy enough in a VM https://pve.proxmox.com/wiki/PCI(e)_Passthrough#_mediated_devices_vgpu_gvt_g

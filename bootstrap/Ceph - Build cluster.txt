@@ -1,0 +1,102 @@
+# Deploy my ceph cluster using cm-1 as ceph-adm
+# https://docs.ceph.com/en/mimic/start/
+
+# Install ceph-deploy
+	# Don't do these in Ubuntu 22.04
+	wget -q -O- 'https://download.ceph.com/keys/release.asc' | sudo apt-key add -
+	echo deb https://download.ceph.com/debian-pacific/ $(lsb_release -sc) main | sudo tee /etc/apt/sources.list.d/ceph.list
+	apt-get update
+apt-get install ceph-deploy
+
+# Configure SSH - admin node needs passwordless SSH access to all cluster nodes
+# Run highstate, or common.users to have the cephadmin user rolled out
+
+# Install NTP. Default settings are fine.
+apt-get install -y ntp
+systemctl disable systemd-timesyncd --now
+
+# cm-1 should not resolve locally as an IP on loopback, so comment out this line it /etc/hosts:
+#127.0.1.1      cm-1.crandell.us        cm-1
+# and verify with this:
+ping cm-1
+
+# https://docs.ceph.com/en/mimic/start/quick-ceph-deploy/
+# Create cluster (as user cephadmin)
+mkdir ceph-cluster
+cd ceph-cluster
+ceph-deploy new cm-1
+ceph-deploy install cm-1 osd-a osd-b osd-c --release pacific
+ceph-deploy mon create-initial
+ceph-deploy admin cm-1 osd-a osd-b osd-c
+ceph-deploy mgr create cm-1
+
+# On each OSD, get the device name (IE /dev/sda), and run this command:
+ceph-volume lvm zap /dev/sda --destroy
+
+# If the following command fails with errors about device-mapper, the kernel may have been updated and not rebooted yet. So reboot the OSDs.
+
+ceph-deploy osd create --data /dev/sda osd-a && ceph-deploy osd create --data /dev/sda osd-b && ceph-deploy osd create --data /dev/sda osd-c
+
+# Verify
+ssh osd-a sudo ceph health
+
+# As of 2021-08-11 (v16.2.5-1focal arm64) ARM boards are unable to start ceph-osd.
+# I found the solution: https://bugs.launchpad.net/ubuntu/+source/ceph/+bug/1917414
+# I had to apply this to all OSDs, which are Odroid-HC4s
+vim /lib/systemd/system/ceph-osd@.service
+MemoryDenyWriteExecute=false
+
+# Add these to the global section of /etc/ceph/ceph.conf:
+osd_pool_default_min_size = 2
+osd_pool_default_size = 3
+
+# Install ceph dashboard
+apt-get install -y ceph-mgr-dashboard
+ceph mgr module enable dashboard
+ceph dashboard create-self-signed-cert
+# Don't use SSL-- the Nginx proxy will handle that.
+ceph config set mgr mgr/dashboard/ssl false
+
+# Save pwd in /home/ncrandell/ceph-login
+chmod 600 /home/ncrandell/ceph-login
+ceph dashboard ac-user-create ncrandell -i /home/ncrandell/ceph-login administrator
+# Browse to https://10.1.1.101:8443
+
+# Configure auth
+cd /etc/ceph
+ceph auth get-or-create client.compute osd 'allow *' mon 'allow r' mds 'allow rw' > ceph.client.compute.keyring
+chmod 600 ceph.client.compute.keyring
+
+# Add cm-1 as mds node, as cephadmin from ~/ceph-cluster/
+ceph-deploy --overwrite-conf mds create cm-1
+
+# Create CephFS (on cm-1, as root)
+ceph osd pool create cephfs_data 128
+ceph osd pool create cephfs_metadata 32
+ceph fs new cephfs cephfs_metadata cephfs_data
+
+# The 4G Odroid-HC4s are experiencing high memory pressure. Change config from cm-1 as root.
+# https://docs.ceph.com/en/latest/rados/configuration/bluestore-config-ref/#automatic-cache-sizing
+ceph config get osd osd_memory_target
+ceph config set osd osd_memory_target 3221225472
+
+# Configure NFS-Ganesha ( https://docs.ceph.com/en/mimic/cephfs/nfs/ )
+# I guess I'll give this a shot using cm-1 as the NFS server
+apt-get install nfs-ganesha nfs-ganesha-ceph
+# There are 2 config files in /etc/ganesha: ganesha.conf and ceph.conf
+# I used the default ceph.conf, also documented here: https://github.com/nfs-ganesha/nfs-ganesha/blob/next/src/config_samples/ceph.conf
+vim /etc/ganesha/ganesha.conf
+	EXPORT
+	{
+			Export_Id = 77;
+			Path = /libraries/videos;
+			Pseudo = /videos;
+			Access_Type = RW;
+			FSAL {
+					Name = CEPH;
+			}
+	}
+
+# Windows' NFS integration is super shitty. I'm going to try Samba
+# https://blog.kingj.net/2020/02/23/how-to/accessing-cephfs-over-samba/
+apt-get install samba samba-vfs-modules

@@ -1,0 +1,88 @@
+# https://www.zabbix.com/download?zabbix=6.0&os_distribution=ubuntu&os_version=18.04_bionic&db=mysql&ws=apache
+# https://www.zabbix.com/documentation/current/en/manual/installation/upgrade/packages/debian_ubuntu
+# https://www.zabbix.com/documentation/6.0/en/manual/installation/upgrade_notes_600
+
+service zabbix-server stop
+service zabbix-agent stop
+rm -rf /etc/apt/sources.list.d/zabbix.list.dpkg-dist
+vim /etc/apt/sources.list.d/zabbix.list
+	deb http://repo.zabbix.com/zabbix/6.0/ubuntu bionic main
+	deb-src http://repo.zabbix.com/zabbix/6.0/ubuntu bionic main
+
+# Keep copies of config
+cp /etc/zabbix/zabbix_agentd.conf /etc/zabbix/zabbix_agentd.conf.bak
+cp /etc/zabbix/zabbix_server.conf /etc/zabbix/zabbix_server.conf.bak
+cp /etc/zabbix/apach.conf /etc/zabbix/apache.conf.bak
+cp /etc/mysql/mysql.cnf /etc/mysql/mysql.cnf.bak
+cp /etc/mysql/mysql.conf.d/mysqld.cnf /etc/mysql/mysql.conf.d/mysqld.cnf.bak
+
+# https://dev.mysql.com/doc/mysql-shell/8.0/en/mysql-shell-install-linux-quick.html
+wget https://dev.mysql.com/get/mysql-apt-config_0.8.22-1_all.deb
+dpkg -i mysql-apt-config_0.8.22-1_all.deb
+
+apt-get update
+apt list -a mysql-server
+apt-get install mysql-server=8.0.29-1ubuntu18.04
+apt-get install mysql-shell
+
+apt-get install zabbix-release=1:6.0-3+ubuntu18.04
+apt-get install zabbix-get=1:6.0.6-1+ubuntu18.04
+apt-get install zabbix-agent=1:6.0.6-1+ubuntu18.04
+apt-get install --only-upgrade zabbix-server-mysql zabbix-frontend-php zabbix-agent
+apt-get upgrade zabbix-apache-conf
+apt-get install zabbix-sql-scripts
+
+# https://www.zabbix.com/documentation/6.0/en/manual/appendix/install/db_primary_keys#mysql
+mysql -uzabbix -pChair9899 zabbix < /usr/share/doc/zabbix-sql-scripts/mysql/history_pk_prepare.sql
+screen
+mysql -uroot -pChair9899 zabbix
+SET GLOBAL local_infile = 'ON';
+\q
+mysqlsh -uroot -S /run/mysqld/mysqld.sock --no-password -Dzabbix
+
+CSVPATH="/var/lib/mysql-files";
+util.exportTable("history_old", CSVPATH + "/history.csv", { dialect: "csv" });
+util.importTable(CSVPATH + "/history.csv", {"dialect": "csv", "table": "history" });
+util.exportTable("history_uint_old", CSVPATH + "/history_uint.csv", { dialect: "csv" });
+util.importTable(CSVPATH + "/history_uint.csv", {"dialect": "csv", "table": "history_uint" });
+util.exportTable("history_str_old", CSVPATH + "/history_str.csv", { dialect: "csv" });
+util.importTable(CSVPATH + "/history_str.csv", {"dialect": "csv", "table": "history_str" });
+util.exportTable("history_log_old", CSVPATH + "/history_log.csv", { dialect: "csv" });
+util.importTable(CSVPATH + "/history_log.csv", {"dialect": "csv", "table": "history_log" });
+util.exportTable("history_text_old", CSVPATH + "/history_text.csv", { dialect: "csv" });
+util.importTable(CSVPATH + "/history_text.csv", {"dialect": "csv", "table": "history_text" });
+
+
+mysql -uroot -pChair9899 zabbix
+DROP TABLE history_old;
+DROP TABLE history_uint_old;
+DROP TABLE history_str_old;
+DROP TABLE history_log_old;
+DROP TABLE history_text_old;
+
+echo 'Include=/usr/local/etc/zabbix_server.conf.d/*.conf' >> /etc/zabbix/zabbix_server.conf
+mkdir -p /usr/local/etc/zabbix_server.conf.d
+vim /usr/local/etc/zabbix_server.conf.d/crandell.conf
+DBHost=localhost
+DBName=zabbix
+DBUser=zabbix
+DBPassword=Chair9899
+StartPollers=8
+StartIPMIPollers=6
+StartPollersUnreachable=2
+StartTrappers=3
+StartPingers=10
+StartDiscoverers=1
+StartAlerters=1
+ExternalScripts=/usr/lib/zabbix/externalscripts
+StartProxyPollers=0
+
+service mysql status
+service zabbix-server status
+
+
+# Cleanup
+apt-get remove mysql-shell
+apt-get autoremove
+rm -rf /var/lib/mysql-files/*
+

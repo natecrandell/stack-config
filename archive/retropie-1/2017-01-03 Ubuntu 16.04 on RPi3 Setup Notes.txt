@@ -1,0 +1,120 @@
+#Ubuntu 16.04 on RPi3 setup notes
+
+#Default username and pwd are ubuntu/ubuntu
+
+
+
+#Disable IPv6
+nano /etc/sysctl.conf
+#Add to file:
+net.ipv6.conf.eth0.disable_ipv6 = 1
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
+EOF
+sysctl -p
+
+
+#Configure time zone
+dpkg-reconfigure tzdata
+
+
+#Add RPi3 PPA
+
+
+#Configure wifi & eth0
+apt-get install wpasupplicant wireless-tools
+iwlist wlan0 scan
+#apt-get update often has errors when updating over eth0 when gateway and dns-nameserver fields are not present.
+nano /etc/network/interfaces
+source-directory /etc/network/interfaces.d
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet dhcp
+
+allow-hotplug wlan0
+iface wlan0 inet dhcp
+wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+iface default inet dhcp
+
+nano /etc/wpa_supplicant/wpa_supplicant.conf
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+
+network={
+ssid="DexNet"
+psk="password"
+
+# Protocol type can be: RSN (for WP2) and WPA (for WPA1)
+proto=WP2
+
+# Key management type can be: WPA-PSK or WPA-EAP (Pre-Shared or Enterprise)
+key_mgmt=WPA-PSK
+
+# Pairwise can be CCMP or TKIP (for WPA2 or WPA1)
+pairwise=TKIP
+
+#Authorization option should be OPEN for both WPA1/WPA2 (in less commonly used are SHARED and LEAP)
+auth_alg=OPEN
+}
+
+
+
+auto wlan0
+allow-hotplug wlan0
+iface wlan0 inet dhcp
+wpa-ssid "DexNet"
+wpa-psk "password"
+nano /etc/wpa_supplicant/wpa_supplicant.conf
+
+
+#Update
+apt-get update
+apt-get upgrade
+apt-get dist-upgrade
+apt-get autoremove
+
+#Change from default user
+apt-get install sudo
+adduser nate
+gpasswd -a nate sudo
+exit
+#Login: nate
+sudo -install
+deluser ubuntu
+
+
+
+
+#Configure postfix to relay mail through Gmail
+#https://community.runabove.com/kb/en/instances/how-to-relay-postfix-mails-via-smtp.gmail.com-on-ubuntu-14.04.html
+#http://mhawthorne.net/posts/postfix-configuring-gmail-as-relay.html
+
+apt-get update && apt-get install postfix mailutils libsasl2-2 ca-certificates libsasl2-modules
+
+nano /etc/postfix/main.cf
+relayhost = [smtp.gmail.com]:587
+mynetworks = 10.1.1.0/24
+smtp_sasl_auth_enable = yes
+smtp_sasl_password_maps = hash:/etc/postfix/sasl/sasl_passwd
+smtp_sasl_security_options = noanonymous
+smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt
+smtp_use_tls = yes
+
+
+nano /etc/postfix/sasl/sasl_passwd
+[smtp.gmail.com]:587 nate@snaptek.us:<passwd>
+
+chmod 400 /etc/postfix/sasl/sasl_passwd
+postmap /etc/postfix/sasl/sasl_passwd
+/usr/sbin/postfix reload
+
+
+#Testing
+echo "Test mail from postfix" | mail -s "Test Postfix" nate@snaptek.us
+
+
+
+#nano /etc/network/interfaces

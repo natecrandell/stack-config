@@ -1,0 +1,96 @@
+# Bootstrap RPi4 with Ubuntu Server 22.04.1 LTS		2022-12
+
+# Flash the SD card with RPi Imager, then boot the Pi with keyboard and monitor
+
+# Use Salt to jumpstart configuration
+	# First login: ubuntu/ubuntu, pwd reset enforced
+
+	sudo systemctl stop unattended-upgrades			# Hurry and clean up before unattended-upgrades kicks off
+	
+	sudo apt update
+	sudo apt install salt-minion
+	sudo vim /etc/salt/minion
+		master: 10.1.1.231
+		id: cs-1
+
+	sudo service salt-minion restart
+
+
+	# On salt-master, run:
+		salt-key -a cs-1 -y
+		salt cs-1 state.highstate
+		salt-key -d cs-1 -y
+
+	# Take a note of RPi's IP address (ip a), then SSH to it. Console session is no longer needed.
+
+# Cleanup all the snapd shit, salt-minion, and cloud-init so netplan won't be such a stupid bitch
+	for installed_snap in $(snap list | grep -v Name | awk '{print $1}'); do snap remove ${installed_snap}; done
+	apt remove --purge cloud-init snapd salt-minion -y && sudo apt autoremove -y
+	sudo userdel ubuntu
+	sudo rm -rf /etc/salt /root/snap /etc/cloud /var/lib/cloud/ /etc/netplan/50-cloud-init.yaml /home/ubuntu /var/log/cloud-init*
+
+apt install raspi-config
+raspi-config
+	1 System
+		S4 Hostname - set to cs-1
+		S7 Splash Screen
+	3 Interface Options
+		# Disable all of them except SSH
+	4 Performance Options
+		P2 GPU Memory - set to minimum (16)
+	5 Localisation Options
+		L2 Timezones - set to US, Mountain
+		L3 Keyboard - this auto-sets the keyboard layout to match your keyboard
+	6 Advanced Options
+		A1 Expand Filesystem - do it
+	
+vim /etc/hosts
+	# Add this line:
+	10.1.1.104 cs-1.crandell.us cs-1
+
+# Disable bluetooth/wifi https://sleeplessbeastie.eu/2022/06/01/how-to-disable-onboard-wifi-and-bluetooth-on-raspberry-pi-4/
+	echo "dtoverlay=disable-bt" | sudo tee -a /boot/config.txt
+	echo "dtoverlay=disable-wifi" | sudo tee -a /boot/config.txt
+
+# Configure networking
+	vim /etc/netplan/01-network-manager-all.yaml
+	network:
+	  version: 2
+	  ethernets:
+		eth0:
+		  dhcp4: false
+		  addresses: [10.1.1.104/24]
+		  routes:
+		   - to: default
+			 via: 10.1.1.1
+		  nameservers:
+			addresses: [10.1.1.214, 10.1.1.1]
+			search: [crandell.us]
+
+	netplan apply
+	# If there is trouble, try:
+		netplan --debug apply
+		
+# Configure NTP
+	sudo vim /etc/systemd/timesyncd.conf
+		NTP=10.1.1.1
+		# Uncomment lines below that^^
+		
+	systemctl restart systemd-timesyncd
+
+# Configure Zabbix agent
+	sudo apt install zabbix-agent
+	sudo vim /etc/zabbix/zabbix_agentd.conf.d/crandell.conf
+		LogType=file
+		LogFileSize=1
+		DebugLevel=3
+		AllowKey=system.run[*]
+		LogRemoteCommands=1
+		Server=10.1.1.217,zabbix-1.crandell.us
+		ListenPort=10050
+		ServerActive=10.1.1.217
+		HostMetadataItem=system.uname
+
+sudo apt full-upgrade && date && sudo reboot
+
+

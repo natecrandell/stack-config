@@ -1,0 +1,60 @@
+# Configure CephFS plugin for persistent volumes
+# https://computingforgeeks.com/ceph-persistent-storage-for-kubernetes-with-cephfs/
+
+
+vim cephfs-provisioner.yml
+k apply -f cephfs-provisioner.yml
+
+ncrandell@cm-1 ~$ sudo ceph auth get-key client.admin
+
+
+k -n cephfs create secret generic ceph-admin-secret --from-literal=key='<key-value>'
+
+ncrandell@cm-1 ~$ sudo ceph fs ls
+name: cephfs, metadata pool: cephfs_metadata, data pools: [cephfs_data ]
+
+vim cephfs-sc.yml
+	---
+	kind: StorageClass
+	apiVersion: storage.k8s.io/v1
+	metadata:
+	  name: cephfs
+	  namespace: cephfs
+	provisioner: ceph.com/cephfs
+	parameters:
+		monitors: 10.1.1.101:6789
+		adminId: admin
+		adminSecretName: ceph-admin-secret
+		adminSecretNamespace: cephfs
+		claimRoot: /
+		
+k apply -f cephfs-sc.yml
+k get sc
+
+vim cephfs-claim.yml
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: cephfs-claim1
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: cephfs
+  resources:
+    requests:
+      storage: 1Gi
+
+k apply -f cephfs-claim.yml
+k get pvc
+
+------------------------------------------------------------- FAIL
+# Redhat's cephfs-provisioner (https://quay.io/repository/external_storage/cephfs-provisioner) is wildly out of date.
+	# Since k8s v1.24 it throws this error and never successfully provisions a claim:
+		controller.go:1004] provision "default/cephfs-claim1" class "cephfs": unexpected error getting claim reference: selfLink was empty, can't make reference
+	# Don't follow the computingforgeeks.com tutorial on this, as it uses the redhat/quay.io provisioner
+-------------------------------------------------------------
+
+# Start over. I need a method that uses the ceph-csi driver, I think
+	# https://github.com/ceph/ceph-csi/blob/devel/docs/deploy-cephfs.md
+	# https://github.com/ceph/ceph-csi/tree/devel/examples/cephfs

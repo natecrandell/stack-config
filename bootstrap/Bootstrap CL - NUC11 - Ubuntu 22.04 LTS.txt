@@ -1,0 +1,38 @@
+# Install Ubuntu Server 22.04 LTS from USB (I used RPi imager, worked perfectly)
+
+# Installation allowed me to do all necessary network config
+# I think I regret doing the "more comfortable" install instead of barebones.
+
+apt-get install -y salt-minion vim sudo gnupg2
+
+rm -rf /etc/salt/minion; vim /etc/salt/minion
+	master: 10.1.1.231
+	id: cl-1
+	
+service salt-minion restart
+
+# On salt master - accept key, and
+salt cl-1 state.sls common.ssh,common.users,common.pkgs
+
+# Can SSH now
+
+
+# Cleanup all the snapd shit, salt-minion, and cloud-init so netplan won't be such a stupid bitch
+	for installed_snap in $(snap list | grep -v Name | awk '{print $1}'); do snap remove ${installed_snap}; done
+	apt remove --purge cloud-init snapd salt-minion -y && sudo apt autoremove -y
+	sudo userdel ubuntu
+	sudo rm -rf /etc/salt /root/snap /etc/cloud /var/lib/cloud/ /etc/netplan/50-cloud-init.yaml /home/ubuntu /var/log/cloud-init*
+	sudo systemctl daemon-reload
+	
+# Configure Zabbix agent
+	sudo apt install zabbix-agent
+	sudo vim /etc/zabbix/zabbix_agentd.conf.d/crandell.conf
+		LogType=file
+		LogFileSize=1
+		DebugLevel=3
+		AllowKey=system.run[*]
+		LogRemoteCommands=1
+		Server=10.1.1.217,zabbix-1.crandell.us
+		ListenPort=10050
+		ServerActive=10.1.1.217
+		HostMetadataItem=system.uname
