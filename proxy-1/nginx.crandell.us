@@ -8,8 +8,8 @@ server {
 
 server {
     listen 80;
-    server_name ceph.crandell.us cloud.crandell.us gitlab.crandell.us;
-    server_name pihole.crandell.us;
+    server_name ceph.crandell.us cloud.crandell.us frigate.crandell.us;
+    server_name gitlab.crandell.us pihole.crandell.us;
     server_name pve.crandell.us tor.crandell.us unifi.crandell.us;
     server_name zabbix.crandell.us zm.crandell.us;
     return 301 https://$host$request_uri;
@@ -83,6 +83,23 @@ server {
         proxy_set_header Connection           "upgrade";
         proxy_buffering off;
         proxy_http_version 1.1;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name frigate.crandell.us;
+
+    ssl_certificate /etc/letsencrypt/live/*.crandell.us/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/*.crandell.us/privkey.pem;
+
+    location / {
+        proxy_pass                            http://10.1.2.224:5000/;
+        proxy_set_header Host                 $host;
+        proxy_set_header X-Real-IP            $remote_addr;
+        proxy_set_header X-Forwarded-For      $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Scheme   $scheme;
+        proxy_set_header Connection           "upgrade";
     }
 }
 
