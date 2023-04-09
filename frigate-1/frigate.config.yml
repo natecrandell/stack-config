@@ -1,0 +1,15 @@
+mqtt:
+  enabled: False
+
+cameras:
+  cam148:
+    ffmpeg:
+      inputs:
+        - path: rtmp://10.1.3.148:554/bcs/channel0_sub.bcs?channel=0&stream=1&user=admin&password=Fnl0464109
+          roles:
+            - detect
+    detect:
+      enabled: False # <---- disable detection until you have a working camera feed
+      width: 640
+      height: 480
+
