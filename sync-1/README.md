@@ -17,15 +17,13 @@ rootfs: local:237/vm-237-disk-0.raw,size=6G
 swap: 512
 ```
 
-## Standard System Config
-
 On cl-1:
 
 ```bash
 mkdir /srv/dropbox
 ```
 
-Back on sync-1:
+## Standard System Config
 
 ```bash
 dpkg-reconfigure tzdata

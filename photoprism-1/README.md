@@ -32,48 +32,12 @@ swap: 4092
 
 - Photoprism recommends at least 4G swap to prevent indexing from causing restarts
 - Ensure nesting=1 (docker requirement)
-- Add photoprism-1 to Proxmox backup job
-- Start container
-- Add DNS A record
-
-## Misc Config
-
-```bash
-dpkg-reconfigure tzdata
-```
-
-## Salt Config
-
-```bash
-ssh root@photoprism-1
-apt update && apt upgrade && apt-get install -y salt-minion vim sudo gnupg2 unattended-upgrades
-echo "master: 10.1.2.231" > /etc/salt/minion
-echo "id: $(hostname)" >> /etc/salt/minion
-service salt-minion restart
-```
-
-From salt master
-
-```bash
-salt-key -a photoprism-1
-salt photoprism-1 test.ping
-salt photoprism-1 state.sls common.users,common.ssh
-```
-
-## Zabbix Config
-
-```bash
-apt install zabbix-agent
-ln -s /mnt/libraries/config/stack/shared/zabbix/zabbix.crandell.conf /etc/zabbix/zabbix_agentd.conf.d/crandell.conf
-service zabbix-agent restart
-```
 
 Note: from here on run everything as unprivileged user
 
 ## Docker Config
 
 ```bash
-sudo apt install curl
 curl -sSL https://get.docker.com | sh
 sudo usermod -aG docker ${USER}
 groups ${USER}
@@ -94,12 +58,7 @@ sudo mkdir /data
 # Download the official docker-compose.yml
 wget https://dl.photoprism.app/docker/docker-compose.yml
 
-vim docker-copmpose.yml
-```
-
-Change these config items
-
-```text
+vim docker-compose.yml
 PHOTOPRISM_ADMIN_PASSWORD: "[redacted]"
 PHOTOPRISM_SITE_URL: "http://10.1.1.236:2342/"
 user: "1111:1111"
