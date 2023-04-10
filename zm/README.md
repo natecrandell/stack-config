@@ -1,114 +1,105 @@
-# Zoneminder Installation
+# Zoneminder Build Notes
 
-# Zoneminder rebuild Ubuntu 22.04
-	# Ubuntu basic install: https://zoneminder.readthedocs.io/en/latest/installationguide/ubuntu.html
-	# Multi-server install: https://zoneminder.readthedocs.io/en/latest/installationguide/multiserver.html
-	# Zoneminder API Docs: https://zoneminder.readthedocs.io/en/latest/api.html
-	# Zoneminder Release Notes: https://github.com/ZoneMinder/zoneminder/releases
+## References
 
-	# Notes:
-		# Go through and build zm-1 first. Then do the exact same process for additional servers, skipping only the database steps.
-		# 10.1.2.0/24 is used as mgmt network. It has an internet gateway for updates, and the proxy hits the zm nodes on this subnet.
-		# 10.1.3.0/24 is the camera network. It is unmanaged, has no gateway, and is isolated from all other networks.
-		# 10.1.1.0/24 is temporarily used on zm-2 until I get rid of the D-Link DCS-932L cameras
-		# The zm nodes mount to a cephfs share using the pve host's connection. This is intended to be used for video recordings.
-		# The local events storage is /mnt/libraries/zoneminder/events
+- Ubuntu basic install: https://zoneminder.readthedocs.io/en/latest/installationguide/ubuntu.html
+- Multi-server install: https://zoneminder.readthedocs.io/en/latest/installationguide/multiserver.html
+- Zoneminder API Docs: https://zoneminder.readthedocs.io/en/latest/api.html
+- Zoneminder Release Notes: https://github.com/ZoneMinder/zoneminder/releases
 
-root@cl-1:/etc/pve/lxc# cat 221.conf
-	arch: amd64
-	cores: 4
-	hostname: zm-1
-	memory: 2048
-	mp0: /mnt/pve/cephfs/libraries/,mp=/mnt/libraries
-	net0: name=eth2,bridge=vmbr2,firewall=1,gw=10.1.2.1,hwaddr=0A:63:3D:38:B5:06,ip=10.1.2.221/24,ip6=auto,type=veth
-	net1: name=eth3,bridge=vmbr3,hwaddr=02:B4:5B:B0:D1:82,ip=10.1.3.221/24,ip6=auto,type=veth
-	onboot: 1
-	ostype: ubuntu
-	rootfs: local:221/vm-221-disk-0.raw,size=6G
-	startup: order=3
-	swap: 0
+# Notes:
+- Go through and build zm-1 first. Then do the exact same process for additional servers, skipping only the database steps.
+- 10.1.2.0/24 is used as mgmt network. It has an internet gateway for updates, and the proxy hits the zm nodes on this subnet.
+- 10.1.3.0/24 is the camera network. It is unmanaged, has no gateway, and is isolated from all other networks.
+- 10.1.1.0/24 is temporarily used on zm-2 until I get rid of the D-Link DCS-932L cameras
+- The zm nodes mount to a cephfs share using the pve host's connection. This is intended to be used for video recordings.
+- The local events storage is /mnt/libraries/zoneminder/events
 
-# Configure container with salt
-	ssh root@zm-2
-	apt update && apt upgrade -y && apt-get install -y salt-minion vim sudo unattended-upgrades curl
-	rm -rf /etc/salt/minion; vim /etc/salt/minion
-		master: 10.1.2.231
-		id: zm-2
+## Container Config
 
-	service salt-minion restart
-	# SSH to salt-1, accept key, and test.ping
-	salt zm-2 state.sls common.users,common.ssh
+```text
+arch: amd64
+cores: 4
+hostname: zm-1
+memory: 2048
+mp0: /mnt/pve/cephfs/libraries/,mp=/mnt/libraries
+net0: name=eth2,bridge=vmbr2,firewall=1,gw=10.1.2.1,hwaddr=0A:63:3D:38:B5:06,ip=10.1.2.221/24,ip6=auto,type=veth
+net1: name=eth3,bridge=vmbr3,hwaddr=02:B4:5B:B0:D1:82,ip=10.1.3.221/24,ip6=auto,type=veth
+onboot: 1
+ostype: ubuntu
+rootfs: local:221/vm-221-disk-0.raw,size=6G
+startup: order=3
+swap: 0
+```
 
-# Configure Zabbix agent
-	apt install zabbix-agent
-	ln -s /mnt/libraries/config/stack/shared/zabbix.crandell.conf /etc/zabbix/zabbix_agentd.conf.d/crandell.conf
-	service zabbix-agent restart
-	# Create host on zabbix server
-	
-dpkg-reconfigure tzdata
+## Standard System Config
+
+Perform the [standard system config](../shared/standard-config.md).
+
+## Zoneminder Config
+
+`https://zoneminder.readthedocs.io/en/latest/installationguide/ubuntu.html#ubuntu-22-04-jammy`
+
+```bash
+apt install -y software-properties-common
+add-apt-repository ppa:iconnor/zoneminder-1.36 && apt update && apt install -y zoneminder
+a2enmod rewrite; a2enconf zoneminder; systemctl restart apache2
+
+vim /etc/php/8.1/apache2/php.ini
+# Uncomment and change date.timezone to your tz. http://php.net/manual/en/timezones.php
+date.timezone = America/Denver
+```
+
+## MySQL Config (zm-1 only)
+
+```bash
+rm /etc/mysql/my.cnf  #(this removes the current symbolic link)
+cp /etc/mysql/mysql.conf.d/mysqld.cnf /etc/mysql/my.cnf
+vim /etc/mysql/my.cnf
+bind-address            = 127.0.0.1,10.1.2.221
+systemctl restart mysql
+
+# Setup user/privs for multi-server (perform on zm-1 only)
+# repeat this process for all additional servers
+mysql -uroot -p
+CREATE USER 'zmuser'@'10.1.2.222' IDENTIFIED BY 'zmpass';
+GRANT ALL ON zm.* to 'zmuser'@'10.1.2.222';
+flush privileges;
+\q
+```
+
+# Event Storage Config
+
+Ensure /mnt/libraries is mounted.
+
+```bash
+mkdir -p /mnt/libraries/events
+chown -R www-data:crandell /mnt/libraries/zoneminder/
+```
+
+## Misc Config
+
+Leave all config files in /etc/zm/ and /etc/zm/conf.d/ as they are. Adding /etc/zm/conf.d/zm-*.conf will override defaults.
+
+```bash
+# The following step will have a corresponding file for zm-*
+ln -s /mnt/libraries/config/stack/zm/zm-1.conf /etc/zm/conf.d/zm-1.conf
+
 ln -s /mnt/libraries/config/stack/shared/clean-cache.cron /etc/cron.d/clean-cache
-	
-# Install & configure Zoneminder
-	# https://zoneminder.readthedocs.io/en/latest/installationguide/ubuntu.html#ubuntu-22-04-jammy
-	apt install -y software-properties-common
-	add-apt-repository ppa:iconnor/zoneminder-1.36 && apt update && apt install -y zoneminder
-	a2enmod rewrite; a2enconf zoneminder; systemctl restart apache2
-	
-	vim /etc/php/8.1/apache2/php.ini
-	#Uncomment and change date.timezone to your tz. http://php.net/manual/en/timezones.php
-	date.timezone = America/Denver
-	
-	Cannot write to event folder /mnt/zoneminder/events
-	
-	# Configure MySQL database (zm-1 only)
-		rm /etc/mysql/my.cnf  #(this removes the current symbolic link)
-		cp /etc/mysql/mysql.conf.d/mysqld.cnf /etc/mysql/my.cnf
-		vim /etc/mysql/my.cnf
-			bind-address            = 127.0.0.1,10.1.2.221
-		systemctl restart mysql
-	
-		# Setup user/privs for multi-server (perform on zm-1 only)
-			# repeat this process for all additional servers
-			mysql -uroot -p
-			CREATE USER 'zmuser'@'10.1.2.222' IDENTIFIED BY 'zmpass';
-			GRANT ALL ON zm.* to 'zmuser'@'10.1.2.222';
-			flush privileges;
-			\q
-	
-# My Zoneminder config
-	# Events (make sure /mnt/libraries is mounted)
-		mkdir -p /mnt/libraries/events
-		chown -R www-data:crandell /mnt/libraries/zoneminder/
-	
-	# ZM config files
-		# Leave all config files in /etc/zm/ and /etc/zm/conf.d/ as they are. Adding /etc/zm/conf.d/zm-*.conf will override defaults.
-		# The following step will have a corresponding file for zm-*
-		ln -s /mnt/libraries/config/stack/zm/zm-1.conf /etc/zm/conf.d/zm-1.conf
-		
-		# Here is a copy of the contents of the file above:
-			ZM_DB_HOST=localhost
-			ZM_DIR_EVENTS=/mnt/libraries/zoneminder
-			ZM_SERVER_HOST=zm-1
-			ZM_WEB_USER=www-data
-			ZM_WEB_GROUP=crandell
-			
-		# The one for zm-2 is identical except:
-			ZM_DB_HOST=zm-1.crandell.us
-			ZM_SERVER_HOST=zm-2
 
 systemctl enable --now zoneminder
-	
-# Remove mysql for nodes that aren't zm-1
-	apt remove mysql-server*
-	apt autoremove
+```
 
-# Note: I've been able to use ffmpeg to record directly from a Reolink cam, with audio:
-	# hi res (clear stream): 
-		ffmpeg -i "rtmp://10.1.3.150/bcs/channel0_main.bcs?channel=0&stream=0&user=admin&password=[pwd]" /mnt/libraries/videos/cam150-test.mp4
-	# low res (fluent stream):
-		ffmpeg -i "rtmp://10.1.3.150/bcs/channel0_sub.bcs?channel=0&stream=1&user=admin&password=[pwd]" /mnt/libraries/videos/cam150-test2.mp4
+## Cleanup
 
-# Zoneminder Camera Config
+Remove mysql for nodes that aren't zm-1
+
+```bash
+apt remove mysql-server*
+apt autoremove
+```
+
+## Zoneminder Camera Config
 
 Camera config resources:
 	Reolink docs: https://reolink.com/wp-content/uploads/2017/01/Reolink-CGI-command-v1.61.pdf
@@ -117,7 +108,8 @@ Camera config resources:
 	Zoneminder define monitors user guide: https://zoneminder.readthedocs.io/en/1.32.3/userguide/definemonitor.html
 	Zoneminder docs: (complete, pdf) https://readthedocs.org/projects/zoneminder/downloads/pdf/stable/
 
-# Best settings I've found
+Best settings I've found
+
 	All cams:
 		Timestamp Label Format: %N %m/%d/%y %H:%M:%S
 		Image Buffer Size (frames): 3
@@ -139,27 +131,50 @@ Camera config resources:
 		Target colorspace: 32 bit color
 		Capture Resolution: (match camera settings for fluent stream)
 
+## Reolink Notes
 
-# Other notes (Reolink)
-	# RTMP
-		# This work best, as noted above. Other available streams:
-		# clear/main/stream0 - rtmp://[ip]/bcs/channel0_main.bcs?channel=0&stream=0&user=[user]&password=[pwd]
-		# fluent/sub/stream1 - rtmp://[ip]/bcs/channel0_sub.bcs?channel=0&stream=1&user=[user]&password=[pwd]
-		# ext/blend/stream2  - rtmp://[ip]/bcs/channel0_ext.bcs?channel=0&stream=2&user=[user]&password=[pwd]
-	# RTSP
-		# For some cameras this resulted in smearing, connectivity struggles, and general unreliability.
-		Source Type: Ffmpeg
-		Source Path: rtsp://[user]:[pwd]@[ip]/h264Preview_01_sub
-		Method: TCP
-		Options: reorder_queue_size=300,allowed_media_types=video
-	# Remote RTP
-		# For some cameras this resulted in connectivity struggles, logging complaints, and general unreliability.
-		Source Type: Remote
-		Protocol: RTSP
-		Method: RTP/Unicast
-		Host Name: [user]:[pwd]@[ip]
-		Port: 554
-		Path: /h264Preview_01_sub
+RTMP
+
+  This work best, as noted above. Other available streams:
+
+  ```text
+  clear/main/stream0 - rtmp://[ip]/bcs/channel0_main.bcs?channel=0&stream=0&user=[user]&password=[pwd]
+  fluent/sub/stream1 - rtmp://[ip]/bcs/channel0_sub.bcs?channel=0&stream=1&user=[user]&password=[pwd]
+  ext/blend/stream2  - rtmp://[ip]/bcs/channel0_ext.bcs?channel=0&stream=2&user=[user]&password=[pwd]
+  ```
+
+RTSP
+
+  For some cameras this resulted in smearing, connectivity struggles, and general unreliability.
+
+  ```text
+  Source Type: Ffmpeg
+  Source Path: rtsp://[user]:[pwd]@[ip]/h264Preview_01_sub
+  Method: TCP
+  Options: reorder_queue_size=300,allowed_media_types=video
+  ```
+
+Remote RTP
+
+  For some cameras this resulted in connectivity struggles, logging complaints, and general unreliability.
+
+  ```text
+  Source Type: Remote
+  Protocol: RTSP
+  Method: RTP/Unicast
+  Host Name: [user]:[pwd]@[ip]
+  Port: 554
+  Path: /h264Preview_01_sub
+  ```
+
+Note: I've been able to use ffmpeg to record directly from a Reolink cam, with audio:
+
+```bash
+# hi res (clear stream): 
+ffmpeg -i "rtmp://10.1.3.150/bcs/channel0_main.bcs?channel=0&stream=0&user=admin&password=[pwd]" /mnt/libraries/videos/cam150-test.mp4
+# low res (fluent stream):
+ffmpeg -i "rtmp://10.1.3.150/bcs/channel0_sub.bcs?channel=0&stream=1&user=admin&password=[pwd]" /mnt/libraries/videos/cam150-test2.mp4
+```
 
 # Reolink Camera information
 	

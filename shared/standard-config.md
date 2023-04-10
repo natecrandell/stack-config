@@ -1,6 +1,6 @@
 # Standard System Config
 
-Ensure that a DNS A record exists for <newct>.
+Ensure that a DNS A record exists for [newct].
 
 ```bash
 ssh root@<newct>
@@ -28,9 +28,12 @@ Note: the above highstate should configure common users with appropriate SSH, se
 ## Configure Zabbix Agent
 
 ```bash
-ln -s /mnt/libraries/config/stack/shared/zabbix.crandell.conf /etc/zabbix/zabbix_agentd.conf.d/crandell.conf
+curl https://repo.zabbix.com/zabbix-official-repo.key -o /usr/share/keyrings/zabbix-official-repo.key
+echo "deb [signed-by=/usr/share/keyrings/zabbix-official-repo.key] https://repo.zabbix.com/zabbix/6.0/ubuntu $(lsb_release -c | awk '{print $2}') main" > /etc/apt/sources.list.d/zabbix.list
+apt update && apt install zabbix-agent -y
+ln -s /mnt/libraries/config/stack/shared/zabbix.crandell.conf /etc/zabbix/zabbix_agentd.d/crandell.conf
 service zabbix-agent restart
 ```
 
 - Ensure that host config exists on zabbix server.
-- Add <newct> to Proxmox backup job
+- Add [newct] to Proxmox backup job

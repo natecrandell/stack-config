@@ -10,7 +10,6 @@ service transmission-daemon stop
 vim /var/lib/transmission-daemon/info/settings.json
 
 
-
 Jul 17 15:12:34 tor-1 transmission-daemon[2648]: [2019-07-17 15:12:34.421] UDP Failed to set receive buffer: requested 419
 Jul 17 15:12:34 tor-1 transmission-daemon[2648]: [2019-07-17 15:12:34.421] UDP Failed to set send buffer: requested 104857
 
@@ -36,15 +35,16 @@ ii  transmission-qt                      2.94-2+deb10u2		amd64        lightweigh
 ii  transmission-remote-cli              1.7.0-1			all          ncurses interface for the Transmission BitTorrent daemon
 ii  transmission-remote-gtk              1.4.1-1			amd64        GTK+ interface for the Transmission BitTorrent daemon
 
+## On cl-1 as root
 
-# On cl-1 as root:
+```bash
 	mkdir /var/lib/vz/transmission-config
 	vim /etc/pve/lxc/230.conf
 		# add these lines right after memory:
 		mp0: /var/lib/vz/transmission-config,mp=/home/syncadmin/.config
 		mp1: /mnt/pve/cephfs/libraries/videos/,mp=/mnt/libraries/videos
-		
-		
+```
+
 salt-run cache.clear_git_lock gitfs type=update
 [WARNING ] Config option 'gitfs_saltenv_whitelist' with value base has an invalid type of str, a list is required for this option
 		
@@ -103,16 +103,24 @@ systemctl stop transmission-daemon
 "speed-limit-up-enabled": true,
 "umask": 2,
 
+Change the transmission-daemon user to syncadmin:crandell
 
-# Change the transmission-daemon user to syncadmin:crandell
-	vim /lib/systemd/system/transmission-daemon.service
-		User=syncadmin
-		Group=crandell
-		
-	systemctl daemon-reload
-	systemctl start transmission-daemon
-	
+```bash
+vim /lib/systemd/system/transmission-daemon.service
+User=syncadmin
+Group=crandell
+
+systemctl daemon-reload
+systemctl start transmission-daemon
+```
 	
 vim /etc/cron.d/zabbix-checks
 MAILTO=""
 */5 * * * * root systemctl status transmission-daemon | grep running; zabbix_sender -z 10.1.1.217 -s tor-1 -k transmission-service-status -o $? > /dev/null
+
+## Misc Config
+
+```bash
+# this ensures Zabbix checks for the syncadmin config dir has permissions
+usermod -aG syncadmin zabbix
+```
