@@ -1,15 +1,39 @@
+birdseye:
+  enabled: True
+  mode: continuous
+
 mqtt:
   enabled: False
 
+detect:
+  enabled: False
+  width: 640
+  height: 480
+  fps: 5
+
+ffmpeg:
+  hwaccel_args: -hwaccel vaapi -vaapi_device /dev/dri/renderD128 -hwaccel_output_format yuv420p
+  input_args: -avoid_negative_ts make_zero -fflags +genpts+discardcorrupt -flags low_delay -strict experimental -analyzeduration 1000M -probesize 1000M -rw_timeout 5000000
+  output_args:
+   record: -f segment -segment_time 10 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c copy
+   rtmp: -c:v copy -c:a aac -f flv
+
 cameras:
-  cam148:
+  cam143:
     ffmpeg:
       inputs:
-        - path: rtmp://10.1.3.148:554/bcs/channel0_sub.bcs?channel=0&stream=1&user=admin&password=Fnl0464109
+        - path: rtmp://10.1.3.143/bcs/channel0_sub.bcs?channel=0&stream=1&user=admin&password={FRIGATE_RTMP_PASSWORD}
+          input_args: preset-rtmp-generic
           roles:
             - detect
-    detect:
-      enabled: False # <---- disable detection until you have a working camera feed
-      width: 640
-      height: 480
-
+        - path: rtmp://10.1.3.143/bcs/channel0_main.bcs?channel=0&stream=0&user=admin&password={FRIGATE_RTMP_PASSWORD}
+          input_args: preset-rtmp-generic
+          roles:
+            - record
+    record:
+      events:
+        required_zones:
+          - zone_0
+    zones:
+      zone_0:
+        coordinates: 293,55,374,70,343,96,342,175,250,119
