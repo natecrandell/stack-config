@@ -68,3 +68,17 @@ sudo docker compose up -d
 The docs for this project are really disorganized. Now I'm looking [here](https://github.com/blakeblackshear/frigate/pkgs/container/frigate).
 
 `http://10.1.2.224:5000/`
+
+frigate  | 2023-04-09 15:19:39.162447047  *************************************************************
+frigate  | 2023-04-09 15:19:39.162449938  *************************************************************
+frigate  | 2023-04-09 15:19:39.162452900  ***    Your config file is not valid!                     ***
+frigate  | 2023-04-09 15:19:39.162454406  ***    Please check the docs at                           ***
+frigate  | 2023-04-09 15:19:39.162455432  ***    https://docs.frigate.video/configuration/index     ***
+frigate  | 2023-04-09 15:19:39.162468552  *************************************************************
+frigate  | 2023-04-09 15:19:39.162469353  *************************************************************
+frigate  | 2023-04-09 15:19:39.162483404  ***    Config Validation Errors                           ***
+frigate  | 2023-04-09 15:19:39.162484290  *************************************************************
+frigate  | 2023-04-09 15:19:39.162485250  Camera cam148 has rtmp enabled, but rtmp is not assigned to an input.
+
+WARNING : RTMP restream is deprecated in favor of the restream role, recommend disabling RTMP.
+WARNING : CPU detectors are not recommended and should only be used for testing or for trial purposes.

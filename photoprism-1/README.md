@@ -3,15 +3,17 @@
 Install Photoprism (docker-compose method) running on Ubuntu 22 container
 `https://docs.photoprism.app/getting-started/docker-compose/`
 
-Design decisions:
+## References
+
+- `https://docs.photoprism.app/release-notes/`
+
+## Design Decisions
 
 - Photoprism will run on an Ubuntu 22.04 container
 - The container storage will run on the Proxmox host's local SSD-backed storage. This is to avoid incurring significant network overhead by using cephfs or an rbd block device.
 - Regular backups will be taken of the container's root fs
 - The Photoprism data dir will be part of the container's root filesystem.
 - An additional mount will be provided by the Proxmox host. It is a connection to photo library.
-
-Download latest Ubuntu 22.04 container template in Proxmox
 
 ## Container Config
 
@@ -58,9 +60,12 @@ sudo mkdir /data
 # Download the official docker-compose.yml
 wget https://dl.photoprism.app/docker/docker-compose.yml
 
+Note: the docker-compose.yml file if FAR from complete. See `https://docs.photoprism.app/getting-started/config-options/` for additional options.
+
 vim docker-compose.yml
 PHOTOPRISM_ADMIN_PASSWORD: "[redacted]"
 PHOTOPRISM_SITE_URL: "http://10.1.1.236:2342/"
+PHOTOPRISM_WAKEUP_INTERVAL: 86400 # Add this option to prevent heavy IO every 15m
 user: "1111:1111"
 volumes:
   - "/mnt/libraries/pictures:/photoprism/originals"
@@ -81,4 +86,12 @@ sudo docker compose pull #update
 sudo docker compose exec photoprism photoprism users add
 ```
 
-Note: I created user: guest, password: password
+## Issues
+
+### Auth
+
+Photoprism's auth handling does not yet have any level of useful maturity. See `https://github.com/photoprism/photoprism/discussions/1678` and `https://docs.photoprism.app/release-notes/#november-2-2022`)
+
+### Maps
+
+The Photoprism project lacks resources to implement maps with reasonable level of detail See `https://github.com/photoprism/photoprism/issues/2998`.

@@ -32,6 +32,7 @@ curl https://repo.zabbix.com/zabbix-official-repo.key -o /usr/share/keyrings/zab
 echo "deb [signed-by=/usr/share/keyrings/zabbix-official-repo.key] https://repo.zabbix.com/zabbix/6.0/ubuntu $(lsb_release -c | awk '{print $2}') main" > /etc/apt/sources.list.d/zabbix.list
 apt update && apt install zabbix-agent -y
 ln -s /mnt/libraries/config/stack/shared/zabbix.crandell.conf /etc/zabbix/zabbix_agentd.d/crandell.conf
+echo "Hostname=$(hostname)" > /etc/zabbix/zabbix_agentd.d/hostname.conf
 service zabbix-agent restart
 ```
 
