@@ -1,6 +1,7 @@
 #!/bin/bash
 
 logsdir='/tmp/logs'
+[[ ! -f ${logsdir} ]] && mkdir -p ${logsdir}
 rm -rf ${logsdir}/*
 
 # Grab latest logs
