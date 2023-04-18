@@ -103,7 +103,8 @@ server {
 }
 
 server {
-    listen [::]:443 ssl default_server ipv6only=off http2; # if your nginx version is >= 1.9.5 you can also add the "http2" flag here
+    #listen [::]:443 ssl default_server ipv6only=off http2; # if your nginx version is >= 1.9.5 you can also add the "http2" flag here
+    listen 443 ssl default_server ipv6only=off;
     server_name home.crandell.us;
 
     ssl_certificate /etc/letsencrypt/live/*.crandell.us/fullchain.pem;
