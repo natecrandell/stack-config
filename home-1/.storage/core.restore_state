@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "core.restore_state",
+  "data": [
+    {
+      "state": {
+        "entity_id": "person.nate",
+        "state": "unknown",
+        "attributes": {
+          "editable": true,
+          "id": "nate",
+          "user_id": "a9e0509979c1421dbf334a70858a04b4",
+          "friendly_name": "nate"
+        },
+        "last_changed": "2023-04-18T18:53:08.084700+00:00",
+        "last_updated": "2023-04-18T18:53:09.538846+00:00",
+        "context": {
+          "id": "01GYAVDB1239K2M79B787Y0G1A",
+          "parent_id": null,
+          "user_id": null
+        }
+      },
+      "extra_data": null,
+      "last_seen": "2023-04-18T18:53:09.539183+00:00"
+    }
+  ]
+}
