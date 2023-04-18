@@ -17,3 +17,12 @@ scene: !include scenes.yaml
 http:
   use_x_forwarded_for: true
   trusted_proxies: 10.1.2.220
+
+zoneminder:
+  - host: zm-1.crandell.us
+    path: /zm/
+    path_zms: /zm/cgi-bin/nph-zms
+    ssl: false
+    verify_ssl: false
+    #username: YOUR_USERNAME
+    #password: YOUR_PASSWORD
