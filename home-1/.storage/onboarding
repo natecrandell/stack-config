@@ -6,7 +6,8 @@
     "done": [
       "user",
       "core_config",
-      "analytics"
+      "analytics",
+      "integration"
     ]
   }
 }
