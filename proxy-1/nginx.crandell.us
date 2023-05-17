@@ -103,7 +103,7 @@ server {
 }
 
 server {
-    listen [::]:443 ssl default_server ipv6only=off http2;
+    listen 443 ssl default_server ipv6only=off http2;
     server_name home.crandell.us;
 
     ssl_certificate /etc/letsencrypt/live/*.crandell.us/fullchain.pem;

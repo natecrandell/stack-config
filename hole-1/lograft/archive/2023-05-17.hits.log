@@ -1,0 +1,2 @@
+May 17 08:25:43 dnsmasq[190]: query[HTTPS] fast-prod-cluster-loki.westus.cloudapp.azure.com from 10.1.1.67
+May 17 08:25:43 dnsmasq[190]: query[AAAA] fast-prod-cluster-loki.westus.cloudapp.azure.com from 10.1.1.67
