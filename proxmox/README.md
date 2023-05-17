@@ -48,6 +48,9 @@ echo "ncrandell ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/ncrandell
 
 ```bash
 ln -s /mnt/pve/cephfs/libraries/config/stack/shared/zabbix.crandell.conf /etc/zabbix/zabbix_agentd.d/crandell.conf
+# Ensure ceph mount is in place before starting Zabbix agent
+vim /lib/systemd/system/zabbix-agent.service
+After=ceph.target
 # This checks for Ceph degraded state:
 ln -s /mnt/pve/cephfs/libraries/config/stack/proxmox/zabbix-checks.cron /etc/cron.d/zabbix-checks
 service zabbix-agent restart

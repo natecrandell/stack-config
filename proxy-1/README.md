@@ -89,6 +89,7 @@ dpkg-reconfigure tzdata
 ln -s /mnt/libraries/config/stack/proxy-1/cert-check.sh /usr/local/bin/cert-check.sh
 ln -s /mnt/libraries/config/stack/shared/clean-cache.cron /etc/cron.d/clean-cache
 ln -s /mnt/libraries/config/stack/proxy-1/cert-check.cron /etc/cron.d/cert-check
+ln -s /mnt/libraries/config/stack/proxy-1/upgrade.conf /etc/nginx/conf.d/upgrade.conf
 mv /etc/cron.d/certbot /etc/cron.d/certbot.disabled
 apt clean all
 ```
