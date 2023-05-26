@@ -16,6 +16,7 @@ send_message() {
 }
 
 renew_certificate() {
+  [[ ! -d /var/log/certbot ]] && mkdir /var/log/certbot
   [[ -f /var/log/certbot/renewal.log ]] && mv /var/log/certbot/renewal.log /var/log/certbot/renewal.log.1
   certbot certonly --authenticator dns-joker --dns-joker-credentials /etc/letsencrypt/secrets/crandell.us.ini --dns-joker-propagation-seconds 120 -d '*.crandell.us' > /var/log/certbot/renewal.log
   systemctl reload nginx
