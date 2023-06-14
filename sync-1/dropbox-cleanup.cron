@@ -1,7 +1,7 @@
 MAILTO=""
 
 # Before the scheduled changes, delete unneeded pic dirs, then rsync a copy of Dropbox to a Seafile library.
-20 1 * * 1 root rm -rf /home/syncadmin/Dropbox/shuh/Movies/.thumbnails /home/syncadmin/Dropbox/nate/DCIM/Camera/.inflight /home/syncadmin/Dropbox/nate/DCIM/Camera/.inflight_lowres/; rsync -a --delete --exclude=".dropbox" --exclude=".dropbox.cache/" --exclude="**/.thumbnails/" --exclude="**/.inflight/" --exclude="**/.inflight_lowres/" /home/syncadmin/Dropbox/ /mnt/libraries/dropbox/
+20 1 * * 1 root rm -rf /home/syncadmin/Dropbox/shuh/Movies/.thumbnails /home/syncadmin/Dropbox/nate/DCIM/Camera/.inflight /home/syncadmin/Dropbox/nate/DCIM/Camera/.inflight_lowres/; rsync -a --delete --exclude=".dropbox" --exclude=".dropbox.cache/" --exclude="**/.thumbnails/" --exclude="**/.inflight/" --exclude="**/.inflight_lowres/" --exclude="**/.trashed-*" /home/syncadmin/Dropbox/ /mnt/libraries/dropbox/
 
 # Move pics/vids for Nate/Shuh
 40 1 * * 1,3,5 root bash -c "/usr/local/bin/dropbox-cleanup.sh --all"
