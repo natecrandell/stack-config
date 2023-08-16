@@ -1,8 +1,8 @@
+#!/bin/bash
+
 # Flags:
 #   Accepted values: morning, hourly, or yesterday
 #   Default behavior is "today so far".
-
-#!/bin/bash
 
 die() {
   echo -e "$(date +'%Y-%m-%d %H:%M:%S') $@"
@@ -52,13 +52,13 @@ main() {
   if [[ ${hit_ip_count} -gt 0 ]]
   then
     # Send slack message with details for each ${hit_ip} found
-    for ip in $(cat ${log_source} | egrep "${date_filter}" | grep "${hit_list}" | cut -d: -f4- | cut -d' ' -f3- | grep ' from ' | cut -d' ' -f3 | sort | uniq | grep -v "${safe_list}")
+    for ip in $(cat ${log_source} | grep -E "${date_filter}" | grep "${hit_list}" | cut -d: -f4- | cut -d' ' -f3- | grep ' from ' | cut -d' ' -f3 | sort | uniq | grep -iv "${safe_list}")
     do
-      send_slack "{\"text\": \"*HIT FOUND: ${ip}*\n\`\`\`$(cat ${log_source} | grep "${ip}" | egrep "${date_filter}" | grep "${hit_list}" | grep -v "AAAA\|HTTPS" | rev | cut -d' ' -f3- | rev)\`\`\`\"}"
+      send_slack "{\"text\": \"*HIT FOUND: ${ip}*\n\`\`\`$(cat ${log_source} | grep "${ip}" | grep -E "${date_filter}" | grep "${hit_list}" | grep -v "AAAA\|HTTPS" | rev | cut -d' ' -f3- | rev)\`\`\`\"}"
 
       # Archive records of the hits, and the context around it
-      cat ${log_source} | grep "${ip}" | egrep "${date_filter}" | grep "${hit_list}" >> "/root/lograft/archive/${archive_date}.hits.log"
-      cat ${log_source} | grep "${ip}" | egrep "${date_filter}" >> "/root/lograft/archive/${archive_date}.context.log"
+      cat ${log_source} | grep "${ip}" | grep -E "${date_filter}" | grep "${hit_list}" >> "/root/lograft/archive/${archive_date}.hits.log"
+      cat ${log_source} | grep "${ip}" | grep -E "${date_filter}" >> "/root/lograft/archive/${archive_date}.context.log"
     done
   else
     send "Hit check suceeded. No hits found."
