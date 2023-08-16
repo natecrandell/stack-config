@@ -54,11 +54,11 @@ main() {
     # Send slack message with details for each ${hit_ip} found
     for ip in $(cat ${log_source} | grep -E "${date_filter}" | grep "${hit_list}" | cut -d: -f4- | cut -d' ' -f3- | grep ' from ' | cut -d' ' -f3 | sort | uniq | grep -iv "${safe_list}")
     do
-      send_slack "{\"text\": \"*HIT FOUND: ${ip}*\n\`\`\`$(cat ${log_source} | grep "${ip}" | grep -E "${date_filter}" | grep "${hit_list}" | grep -v "AAAA\|HTTPS" | rev | cut -d' ' -f3- | rev)\`\`\`\"}"
+      send_slack "{\"text\": \"*HIT FOUND: ${ip}*\n\`\`\`$(cat ${log_source} | grep "${ip}"$ | grep -E "${date_filter}" | grep "${hit_list}" | grep -v "AAAA\|HTTPS" | rev | cut -d' ' -f3- | rev | grep -iv "${safe_list}")\`\`\`\"}"
 
       # Archive records of the hits, and the context around it
-      cat ${log_source} | grep "${ip}" | grep -E "${date_filter}" | grep "${hit_list}" >> "/root/lograft/archive/${archive_date}.hits.log"
-      cat ${log_source} | grep "${ip}" | grep -E "${date_filter}" >> "/root/lograft/archive/${archive_date}.context.log"
+      cat ${log_source} | grep "${ip}"$ | grep -E "${date_filter}" | grep "${hit_list}" | grep -iv "${safe_list}" >> "/root/lograft/archive/${archive_date}.hits.log"
+      cat ${log_source} | grep "${ip}"$ | grep -E "${date_filter}" | grep -iv "${safe_list}" >> "/root/lograft/archive/${archive_date}.context.log"
     done
   else
     send "Hit check suceeded. No hits found."
