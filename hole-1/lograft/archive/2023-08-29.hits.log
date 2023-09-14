@@ -1,0 +1,15 @@
+Aug 29 01:04:37 dnsmasq[206]: query[HTTPS] chaturbate.com from 10.1.1.1
+Aug 29 01:04:37 dnsmasq[206]: query[AAAA] chaturbate.com from 10.1.1.1
+Aug 29 01:04:37 dnsmasq[206]: query[A] chaturbate.com from 10.1.1.1
+Aug 29 01:04:37 dnsmasq[206]: query[AAAA] m.chaturbate.com from 10.1.1.1
+Aug 29 01:04:37 dnsmasq[206]: query[A] m.chaturbate.com from 10.1.1.1
+Aug 29 01:04:37 dnsmasq[206]: query[HTTPS] m.chaturbate.com from 10.1.1.1
+Aug 29 08:30:51 dnsmasq[71345]: query[AAAA] chaturbate.com from 10.1.1.1
+Aug 29 08:30:51 dnsmasq[71346]: query[A] chaturbate.com from 10.1.1.1
+Aug 29 08:30:51 dnsmasq[71347]: query[HTTPS] chaturbate.com from 10.1.1.1
+Aug 29 08:31:04 dnsmasq[71379]: query[AAAA] fptls.chaturbate.com from 10.1.1.1
+Aug 29 08:31:04 dnsmasq[71380]: query[A] fptls.chaturbate.com from 10.1.1.1
+Aug 29 08:31:04 dnsmasq[71381]: query[HTTPS] fptls.chaturbate.com from 10.1.1.1
+Aug 29 08:31:04 dnsmasq[71386]: query[AAAA] token.chaturbate.com from 10.1.1.1
+Aug 29 08:31:04 dnsmasq[71387]: query[HTTPS] token.chaturbate.com from 10.1.1.1
+Aug 29 08:31:04 dnsmasq[71388]: query[A] token.chaturbate.com from 10.1.1.1
