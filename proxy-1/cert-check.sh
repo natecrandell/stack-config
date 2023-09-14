@@ -1,8 +1,8 @@
+#!/bin/bash
+
 # This script...
 
 # REQUIREMENTS: curl, certbot, python3-pip
-
-#!/bin/bash
 
 set_vars() {
   expire_date="$(certbot certificates -d '*.crandell.us' 2> /dev/null | grep Expiry | cut -d: -f2 | awk '{print $1}')"
