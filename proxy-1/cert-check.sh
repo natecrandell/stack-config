@@ -22,12 +22,6 @@ renew_certificate() {
   systemctl reload nginx
 }
 
-# For debugging
-#echo "Expire Date = ${expire_date}"
-#echo "Expire Epoch = ${expire_epoch}"
-#echo "Now Epoch = ${now_epoch}"
-#echo "${expire_epoch} - ${now_epoch} = $(( ${expire_epoch} - ${now_epoch} ))"
-
 main() {
   set_vars
 
@@ -37,15 +31,19 @@ main() {
 
   # If cert expires in the next 3 days, renew it
   # Note: "<@UT8HYKMQW>" at-mentions me
-  [[ $(( ${expire_epoch} - ${now_epoch} )) -le 259200 ]] && \
+  if [[ $(( ${expire_epoch} - ${now_epoch} )) -le 259200 ]]
+  then
     renew_certificate && \
-    send_message "{\"text\": \"<@UT8HYKMQW>\n*SSL Cert Renewal Succeeded*\n\`\`\`$(cat /var/log/certbot/renewal.log)\`\`\`\"}" && \
+    send_message "{\"text\": \"<@UT8HYKMQW>\n*SSL Cert Renewal Succeeded*\n\`\`\`$(cat /var/log/certbot/renewal.log)\`\`\`\"}"
+    
     scp /etc/letsencrypt/live/*.crandell.us/fullchain.pem root@gitlab-1.crandell.us:/etc/gitlab/ssl/gitlab.crandell.us.crt && \
     scp /etc/letsencrypt/live/*.crandell.us/privkey.pem root@gitlab-1.crandell.us:/etc/gitlab/ssl/gitlab.crandell.us.key && \
     ssh root@gitlab-1.crandell.us "service gitlab-runsvdir restart" && \
     send_message "{\"text\": \"*SSL Cert -> Gitlab Succeeded*\"}"
-
-  [[ $(( ${expire_epoch} - ${now_epoch} )) -gt 259200 ]] && echo "Renewal not necessary at this time."
+  elif [[ $(( ${expire_epoch} - ${now_epoch} )) -gt 259200 ]]
+  then
+    echo "Renewal not necessary at this time."
+  fi
 }
 
 main
