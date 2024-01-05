@@ -45,7 +45,7 @@ main() {
   set_vars "$1"
 
   # Check for hits
-  hit_ip_count=$(cat ${log_source} | grep -E "${date_filter}" | grep "${hit_list}" | cut -d: -f4- | cut -d' ' -f3- | grep ' from ' | cut -d' ' -f3 | sort | uniq | grep -iv "${safe_list}" | wc -l 2> /dev/null)
+  hit_ip_count=$(cat ${log_source} | grep -E "${date_filter}" | grep "${hit_list}" | grep -iv "${safe_list}" | cut -d: -f4- | cut -d' ' -f3- | grep ' from ' | cut -d' ' -f3 | sort | uniq | wc -l 2> /dev/null)
   hit_ip_count_retcode=$?
   [[ ${hit_ip_count_retcode} -ne 0 ]] && die "Failed to check for hit IPs. retcode=${hit_ip_count_retcode}"
 
@@ -58,7 +58,7 @@ main() {
 
       # Archive records of the hits, and the context around it
       cat ${log_source} | grep "${ip}"$ | grep -E "${date_filter}" | grep "${hit_list}" | grep -iv "${safe_list}" >> "/root/lograft/archive/${archive_date}.hits.log"
-      cat ${log_source} | grep "${ip}"$ | grep -E "${date_filter}" | grep -i "${safe_list}" >> "/root/lograft/archive/${archive_date}.context.log"
+      cat ${log_source} | grep "${ip}"$ | grep -E "${date_filter}" | grep -iv "${safe_list}" >> "/root/lograft/archive/${archive_date}.context.log"
     done
   else
     send "Hit check suceeded. No hits found."
