@@ -19,22 +19,18 @@ renew_certificate() {
   [[ ! -d /var/log/certbot ]] && mkdir /var/log/certbot
   [[ -f /var/log/certbot/renewal.log ]] && mv /var/log/certbot/renewal.log /var/log/certbot/renewal.log.1
   certbot certonly --authenticator dns-joker --dns-joker-credentials /etc/letsencrypt/secrets/crandell.us.ini --dns-joker-propagation-seconds 120 -d '*.crandell.us' > /var/log/certbot/renewal.log
+  renewal_status=$?
   systemctl reload nginx
+  sleep 2s
 }
 
 main() {
   set_vars
 
-  # Send message if cert expires in the next week (60s * 60m * 24h * 7d = 604800)
-  # [[ $(( ${expire_epoch} - ${now_epoch} )) -le 604800 ]] && \
-  #   send_message "{\"text\": \"<@UT8HYKMQW>\n*SSL Cert Expires on ${expire_date}*\n\`\`\`$(certbot certificates -d *.crandell.us 2> /dev/null | grep -v ^- | grep -v Found)\`\`\`\"}"
-
-  # If cert expires in the next 3 days, renew it
-  # Note: "<@UT8HYKMQW>" at-mentions me
+  # If cert expires in the next 3 days, renew it (Note: "<@UT8HYKMQW>" at-mentions me)
   if [[ $(( ${expire_epoch} - ${now_epoch} )) -le 259200 ]]
   then
     renew_certificate
-    renewal_status=$?
     # send_message "{\"text\": \"<@UT8HYKMQW>\n*SSL Cert Renewal Succeeded*\n\`\`\`$(cat /var/log/certbot/renewal.log)\`\`\`\"}"
     send_message "{\"text\": \"<@UT8HYKMQW>\n*SSL Cert Renewal Succeeded*\nRenewal return code = ${renewal_status}\n\`\`\`$(cat /var/log/certbot/renewal.log)\`\`\`\"}"
     
