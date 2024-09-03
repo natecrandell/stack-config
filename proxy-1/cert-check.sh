@@ -33,13 +33,19 @@ main() {
   # Note: "<@UT8HYKMQW>" at-mentions me
   if [[ $(( ${expire_epoch} - ${now_epoch} )) -le 259200 ]]
   then
-    renew_certificate && \
-    send_message "{\"text\": \"<@UT8HYKMQW>\n*SSL Cert Renewal Succeeded*\n\`\`\`$(cat /var/log/certbot/renewal.log)\`\`\`\"}"
+    renew_certificate
+    renewal_status=$?
+    # send_message "{\"text\": \"<@UT8HYKMQW>\n*SSL Cert Renewal Succeeded*\n\`\`\`$(cat /var/log/certbot/renewal.log)\`\`\`\"}"
+    send_message "{\"text\": \"<@UT8HYKMQW>\n*SSL Cert Renewal Succeeded*\nRenewal return code = ${renewal_status}\n\`\`\`$(cat /var/log/certbot/renewal.log)\`\`\`\"}"
     
-    scp /etc/letsencrypt/live/*.crandell.us/fullchain.pem root@gitlab-1.crandell.us:/etc/gitlab/ssl/gitlab.crandell.us.crt && \
-    scp /etc/letsencrypt/live/*.crandell.us/privkey.pem root@gitlab-1.crandell.us:/etc/gitlab/ssl/gitlab.crandell.us.key && \
-    ssh root@gitlab-1.crandell.us "service gitlab-runsvdir restart" && \
-    send_message "{\"text\": \"*SSL Cert -> Gitlab Succeeded*\"}"
+    if [[ ${renewal_status} -eq 0 ]]
+    then
+      send_message "{\"text\": \"<@UT8HYKMQW>\n*SSL Cert Renewal*\nAttempting to send renewed certs to gitlab-1...\"}"
+      scp /etc/letsencrypt/live/*.crandell.us/fullchain.pem root@gitlab-1.crandell.us:/etc/gitlab/ssl/gitlab.crandell.us.crt && \
+      scp /etc/letsencrypt/live/*.crandell.us/privkey.pem root@gitlab-1.crandell.us:/etc/gitlab/ssl/gitlab.crandell.us.key && \
+      ssh root@gitlab-1.crandell.us "service gitlab-runsvdir restart" && \
+      send_message "{\"text\": \"*SSL Cert -> Gitlab Succeeded*\"}"
+    fi
   elif [[ $(( ${expire_epoch} - ${now_epoch} )) -gt 259200 ]]
   then
     echo "Renewal not necessary at this time."
