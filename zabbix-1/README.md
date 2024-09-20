@@ -1,5 +1,21 @@
 # Zabbix Server Build Notes
 
+## Container Config (Ubuntu 22.04)
+
+```text
+arch: amd64
+cores: 3
+hostname: zabbix-1
+memory: 2048
+net1: name=eth2,bridge=vmbr2,firewall=1,gw=10.1.2.1,hwaddr=8A:0A:D3:95:28:F6,ip=10.1.2.217/24,ip6=auto,type=veth
+net2: name=eth3,bridge=vmbr3,firewall=1,hwaddr=CA:0F:56:C7:45:69,ip=10.1.3.217/24,ip6=auto,type=veth
+onboot: 1
+ostype: ubuntu
+rootfs: local:217/vm-217-disk-1.raw,size=15G
+startup: order=3
+swap: 0
+```
+
 ## Locations
 
 /etc/zabbix/web/zabbix.conf.php

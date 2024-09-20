@@ -5,7 +5,7 @@
 - `https://www.smarthomebeginner.com/pi-hole-setup-guide/`
 - Blocklist collections: `https://firebog.net/` (run pihole -g after changing adlists)
 
-## Container Config File
+## Container Config File (Ubuntu 20.04)
 
 ```text
 #Main subnet is required for DNS requests from DHCP users.

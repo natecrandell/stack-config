@@ -1,5 +1,23 @@
 # Gitlab Build Notes
 
+## Container Config (Ubuntu 18.04)
+
+```text
+#Requires main subnet, as this is not behind proxy.
+arch: amd64
+cores: 2
+hostname: gitlab-1
+memory: 4096
+net0: name=eth1,bridge=vmbr1,firewall=1,hwaddr=42:88:E3:92:87:CB,ip=10.1.1.219/24,ip6=auto,type=veth
+net1: name=eth2,bridge=vmbr2,firewall=1,gw=10.1.2.1,hwaddr=1A:62:05:1F:2E:65,ip=10.1.2.219/24,ip6=auto,type=veth
+onboot: 1
+ostype: ubuntu
+protection: 1
+rootfs: local:219/vm-219-disk-0.raw,mountoptions=noatime,size=16G
+startup: order=4
+swap: 0
+```
+
 Ubuntu 16.04 CT
 `https://about.gitlab.com/installation/#ubuntu`
 

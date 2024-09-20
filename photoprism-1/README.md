@@ -15,7 +15,7 @@ Install Photoprism (docker-compose method) running on Ubuntu 22 container
 - The Photoprism data dir will be part of the container's root filesystem.
 - An additional mount will be provided by the Proxmox host. It is a connection to photo library.
 
-## Container Config
+## Container Config (Ubuntu 22.04)
 
 ```text
 arch: amd64
@@ -27,8 +27,8 @@ mp0: /mnt/pve/cephfs/libraries/,mp=/mnt/libraries
 net1: name=eth2,bridge=vmbr2,firewall=1,gw=10.1.2.1,hwaddr=C2:E3:58:14:7B:38,ip=10.1.2.236/24,ip6=auto,type=veth
 onboot: 1
 ostype: ubuntu
-rootfs: local:236/vm-236-disk-0.raw,size=40G
-startup: order=4
+rootfs: local2:236/vm-236-disk-0.raw,size=40G
+startup: order=5
 swap: 4092
 ```
 

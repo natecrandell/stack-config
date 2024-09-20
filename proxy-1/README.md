@@ -2,7 +2,7 @@
 
 Nginx reverse proxy on Ubuntu 22.04 (with cert auto-renewal)
 
-## Container Config
+## Container Config (Ubuntu 22.04)
 
 ```text
 arch: amd64

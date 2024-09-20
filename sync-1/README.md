@@ -2,7 +2,7 @@
 
 NOTE: This documentation is incomplete. Most of the missing portions can be pulled from salt repos: states & config.
 
-I created an Ubuntu 22.04 CT with these parameters:
+## Container Config (Ubuntu 22.04)
 
 ```text
 arch: amd64
@@ -11,9 +11,11 @@ hostname: sync-1
 memory: 4092
 mp0: /mnt/pve/cephfs/libraries/,mp=/mnt/libraries
 mp1: /srv/dropbox/,mp=/home/syncadmin/Dropbox
-net0: name=eth0,bridge=vmbr0,firewall=1,gw=10.1.1.1,hwaddr=E6:A6:D6:FC:B8:1B,ip=10.1.1.237/24,ip6=auto,type=veth
+net1: name=eth2,bridge=vmbr2,firewall=1,gw=10.1.2.1,hwaddr=7E:AB:D6:0E:2A:E5,ip=10.1.2.237/24,ip6=auto,type=veth
+onboot: 1
 ostype: ubuntu
 rootfs: local:237/vm-237-disk-0.raw,size=6G
+startup: order=4
 swap: 512
 ```
 

@@ -16,7 +16,7 @@
 - The zm nodes mount to a cephfs share using the pve host's connection. This is intended to be used for video recordings.
 - The local events storage is /mnt/libraries/zoneminder/events
 
-## Container Config
+## Container Config (Ubuntu 22.04)
 
 ```text
 arch: amd64
@@ -29,7 +29,22 @@ net1: name=eth3,bridge=vmbr3,hwaddr=02:B4:5B:B0:D1:82,ip=10.1.3.221/24,ip6=auto,
 onboot: 1
 ostype: ubuntu
 rootfs: local:221/vm-221-disk-0.raw,size=6G
-startup: order=3
+startup: order=4
+swap: 0
+```
+
+```text
+arch: amd64
+cores: 4
+hostname: zm-2
+memory: 2048
+mp0: /mnt/pve/cephfs/libraries/,mp=/mnt/libraries
+net1: name=eth2,bridge=vmbr2,firewall=1,gw=10.1.2.1,hwaddr=2A:6D:BB:EE:01:8A,ip=10.1.2.222/24,ip6=auto,type=veth
+net2: name=eth3,bridge=vmbr3,hwaddr=86:0E:72:EB:1D:CC,ip=10.1.3.222/24,ip6=auto,type=veth
+onboot: 1
+ostype: ubuntu
+rootfs: local:222/vm-222-disk-0.raw,size=6G
+startup: order=4
 swap: 0
 ```
 

@@ -1,30 +1,43 @@
 # https://help.ubuntu.com/community/TransmissionHowTo
 
+## Container Config (Ubuntu 22.04)
+
+```text
+arch: amd64
+cores: 2
+hostname: tor-1
+memory: 6144
+mp0: /var/lib/vz/transmission-config,mp=/home/syncadmin/.config
+mp1: /mnt/pve/cephfs/libraries/videos/,mp=/mnt/libraries/videos
+mp2: /mnt/pve/cephfs/libraries/config/,mp=/mnt/libraries/config
+net1: name=eth2,bridge=vmbr2,gw=10.1.2.1,hwaddr=4A:E9:89:34:05:DE,ip=10.1.2.230/24,ip6=auto,type=veth
+onboot: 1
+ostype: ubuntu
+rootfs: local:230/vm-230-disk-1.raw,size=6G
+startup: order=5
+swap: 512
+```
+
 apt-get install transmission-cli transmission-common transmission-daemon
 
+## Configure settings
 
-
-
-# Configure settings
 service transmission-daemon stop
 vim /var/lib/transmission-daemon/info/settings.json
 
-
+```text
 Jul 17 15:12:34 tor-1 transmission-daemon[2648]: [2019-07-17 15:12:34.421] UDP Failed to set receive buffer: requested 419
 Jul 17 15:12:34 tor-1 transmission-daemon[2648]: [2019-07-17 15:12:34.421] UDP Failed to set send buffer: requested 104857
-
+```
 
 net.core.rmem_max = 4194304
 net.core.wmem_max = 1048576
 
 users:crandell:home: /var/lib/transmission-daemon
 
-
-
 /var/lib/transmission-daemon/downloads
 /var/lib/transmission-daemon/.config/transmission-daemon/[blocklists|resume|torrents]
 /var/lib/transmission-daemon/.config/transmission-daemon/settings.json -> /etc/transmission-daemon/settings.json
-
 
 root@sync-1:/etc/transmission-daemon# dpkg -l | grep transm
 ii  transmission-cli                     2.94-2+deb10u2		amd64        lightweight BitTorrent client (command line programs)
@@ -38,18 +51,18 @@ ii  transmission-remote-gtk              1.4.1-1			amd64        GTK+ interface f
 ## On cl-1 as root
 
 ```bash
-	mkdir /var/lib/vz/transmission-config
-	vim /etc/pve/lxc/230.conf
-		# add these lines right after memory:
-		mp0: /var/lib/vz/transmission-config,mp=/home/syncadmin/.config
-		mp1: /mnt/pve/cephfs/libraries/videos/,mp=/mnt/libraries/videos
+mkdir /var/lib/vz/transmission-config
+vim /etc/pve/lxc/230.conf
+# add these lines right after memory:
+mp0: /var/lib/vz/transmission-config,mp=/home/syncadmin/.config
+mp1: /mnt/pve/cephfs/libraries/videos/,mp=/mnt/libraries/videos
 ```
 
 salt-run cache.clear_git_lock gitfs type=update
 [WARNING ] Config option 'gitfs_saltenv_whitelist' with value base has an invalid type of str, a list is required for this option
-		
-		
+
 # Configure container with salt
+
 	ssh root@photoprism-1
 	apt update && apt upgrade && apt-get install -y salt-minion vim sudo gnupg2
 	rm -rf /etc/salt/minion; vim /etc/salt/minion

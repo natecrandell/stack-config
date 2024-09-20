@@ -1,5 +1,30 @@
 # Seafile Build Notes
 
+## Qemu Config
+
+```text
+agent: 1
+balloon: 0
+boot: c
+bootdisk: virtio0
+cores: 4
+cpuunits: 1000
+hotplug: 0
+memory: 8192
+name: seafile-1
+net1: virtio=BE:6B:C4:07:6A:EE,bridge=vmbr2,firewall=1
+numa: 0
+onboot: 1
+ostype: l26
+scsihw: virtio-scsi-single
+smbios1: uuid=43b2b5a9-6d9a-4578-983a-2c841fcc76ae
+sockets: 1
+startup: order=3
+tablet: 0
+virtio0: local2:218/vm-218-disk-0.raw,iothread=1,replicate=0,size=12G
+vmgenid: 9136957a-3722-45fb-956b-dd1ed3598056
+```
+
 ## Misc Config
 
 ```bash
