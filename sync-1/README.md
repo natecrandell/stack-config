@@ -11,6 +11,7 @@ hostname: sync-1
 memory: 4092
 mp0: /mnt/pve/cephfs/libraries/,mp=/mnt/libraries
 mp1: /srv/dropbox/,mp=/home/syncadmin/Dropbox
+mp2: /mnt/sda1/cephfsbackup/,mp=/mnt/cephfsbackup
 net1: name=eth2,bridge=vmbr2,firewall=1,gw=10.1.2.1,hwaddr=7E:AB:D6:0E:2A:E5,ip=10.1.2.237/24,ip6=auto,type=veth
 onboot: 1
 ostype: ubuntu
@@ -22,7 +23,7 @@ swap: 512
 On cl-1:
 
 ```bash
-mkdir /srv/dropbox
+mkdir /srv/dropbox /mnt/cephfsbackup
 ```
 
 ## Standard System Config
@@ -87,6 +88,13 @@ ln -s /mnt/libraries/config/stack/sync-1/dropbox-cleanup.cron /etc/cron.d/dropbo
 apt install ffmpeg exiftool curl
 ln -s /mnt/libraries/config/stack/sync-1/auto-transcode.sh /usr/local/bin/auto-transcode.sh
 ln -s /mnt/libraries/config/stack/sync-1/auto-transcode.cron /etc/cron.d/auto-transcode
+```
+
+### Configure cephfsbackup job
+
+```bash
+ln -s /mnt/libraries/config/stack/sync-1/cephfsbackup.sh /usr/local/bin/cephfsbackup.sh
+ln -s /mnt/libraries/config/stack/sync-1/cephfsbackup.cron /etc/cron.d/cephfsbackup
 ```
 
 ### Configure handling of stack-config repo

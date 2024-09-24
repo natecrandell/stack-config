@@ -1,0 +1,4 @@
+MAILTO=""
+
+# Backup critical libraries to cl-1's SSD drive in case of Ceph fails.
+45 4 * * 1 root bash -c "/usr/local/bin/cephfsbackup.sh"
