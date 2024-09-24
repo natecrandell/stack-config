@@ -13,7 +13,7 @@ main() {
   destination="/mnt/cephfsbackup"
 
   for dir in ${dirs}; do
-    rsync --archive --delete --exclude=".git/" "${source}/${dir}" ${destination}/
+    rsync --archive --delete --bwlimit=50000 --exclude=".git/" "${source}/${dir}" ${destination}/
     retcode=$?
     [[ ${retcode} -ne 0 ]] && send_slack "{\"text\": \"*FAILURE*\nFrom: sync-1\nJob: cephfsbackup.sh\n\nReceived return code ${retcode} en attempting to rsync \`${source}/${dir}\` -> \`${destination}/\`\"}"
   done
