@@ -1,0 +1,6 @@
+Feb 16 15:52:16 dnsmasq[210]: query[AAAA] www.learnsextherapy.com from 10.1.1.1
+Feb 16 15:52:16 dnsmasq[210]: query[A] www.learnsextherapy.com from 10.1.1.1
+Feb 16 15:52:16 dnsmasq[210]: query[HTTPS] www.learnsextherapy.com from 10.1.1.1
+Feb 16 15:57:20 dnsmasq[210]: query[HTTPS] onlyfans.com from 10.1.1.1
+Feb 16 15:57:20 dnsmasq[210]: query[A] onlyfans.com from 10.1.1.1
+Feb 16 15:57:20 dnsmasq[210]: query[AAAA] onlyfans.com from 10.1.1.1

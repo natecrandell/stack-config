@@ -1,0 +1,15 @@
+Mar 17 22:15:41 dnsmasq[195]: query[A] bellesa.co from 10.1.1.76
+Mar 17 22:15:41 dnsmasq[195]: query[HTTPS] bellesa.co from 10.1.1.76
+Mar 17 22:15:42 dnsmasq[195]: query[AAAA] www.bellesa.co from 10.1.1.76
+Mar 17 22:15:42 dnsmasq[195]: query[A] www.bellesa.co from 10.1.1.76
+Mar 17 22:15:42 dnsmasq[195]: query[HTTPS] www.bellesa.co from 10.1.1.76
+Mar 17 22:15:42 dnsmasq[195]: query[AAAA] c.bellesa.co from 10.1.1.76
+Mar 17 22:15:42 dnsmasq[195]: query[A] c.bellesa.co from 10.1.1.76
+Mar 17 22:15:42 dnsmasq[195]: query[HTTPS] c.bellesa.co from 10.1.1.76
+Mar 17 22:15:45 dnsmasq[195]: query[AAAA] s.bellesa.co from 10.1.1.76
+Mar 17 22:15:45 dnsmasq[195]: query[A] s.bellesa.co from 10.1.1.76
+Mar 17 22:15:45 dnsmasq[195]: query[HTTPS] s.bellesa.co from 10.1.1.76
+Mar 17 22:15:47 dnsmasq[195]: query[AAAA] bellesa.co from 10.1.1.76
+Mar 17 22:27:51 dnsmasq[195]: query[AAAA] www.bellesa.co from 10.1.1.76
+Mar 17 22:27:51 dnsmasq[195]: query[A] www.bellesa.co from 10.1.1.76
+Mar 17 22:27:51 dnsmasq[195]: query[HTTPS] www.bellesa.co from 10.1.1.76

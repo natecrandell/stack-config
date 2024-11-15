@@ -1,0 +1,12 @@
+Nov  4 00:09:09 dnsmasq[2935058]: query[AAAA] gcore-pic.xnxx-cdn.com from 10.1.1.21
+Nov  4 00:09:09 dnsmasq[2935058]: query[A] gcore-pic.xnxx-cdn.com from 10.1.1.21
+Nov  4 00:09:09 dnsmasq[2935058]: query[HTTPS] gcore-pic.xnxx-cdn.com from 10.1.1.21
+Nov  4 00:29:28 dnsmasq[2935058]: query[AAAA] www.xnxx.com from 10.1.1.21
+Nov  4 00:29:28 dnsmasq[2935058]: query[A] www.xnxx.com from 10.1.1.21
+Nov  4 00:29:28 dnsmasq[2935058]: query[HTTPS] www.xnxx.com from 10.1.1.21
+Nov  4 00:45:16 dnsmasq[2935058]: query[AAAA] cdn77-vid.xnxx-cdn.com from 10.1.1.21
+Nov  4 00:45:16 dnsmasq[2935058]: query[A] cdn77-vid.xnxx-cdn.com from 10.1.1.21
+Nov  4 00:45:16 dnsmasq[2935058]: query[HTTPS] cdn77-vid.xnxx-cdn.com from 10.1.1.21
+Nov  4 00:53:27 dnsmasq[2935058]: query[AAAA] cdn77-vid.xnxx-cdn.com from 10.1.1.21
+Nov  4 00:53:27 dnsmasq[2935058]: query[A] cdn77-vid.xnxx-cdn.com from 10.1.1.21
+Nov  4 00:53:27 dnsmasq[2935058]: query[HTTPS] cdn77-vid.xnxx-cdn.com from 10.1.1.21
