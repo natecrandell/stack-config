@@ -69,6 +69,8 @@ mover() {
   [[ ${filetype} == 'mp4' ]] && targetdir="homevideos"
 
   rm -rf /tmp/mover.list
+  # Filenames containing spaces should have the spaces swapped out for underscores.
+  find /home/syncadmin/Dropbox/${name}/${finddir}/ -name "* *.${filetype}" -mtime +30 | while read file; do mv "$file" ${file// /_}; done
   find /home/syncadmin/Dropbox/${name}/${finddir}/ -name *.${filetype} -mtime +30 -exec ls -l --time-style=+"%Y" {} \; | awk '{print $6 " " $7}' >> /tmp/mover.list
 
   for year in $(awk '{print $1}' /tmp/mover.list | uniq)
