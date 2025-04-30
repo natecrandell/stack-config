@@ -1,3 +1,4 @@
+#!/bin/bash
 # This script grabs pictures and/or videos from Nate and/or Shuh's cell phones (via Dropbox sync)
 # that are older than 30 days, and moves them to the appropriate directory for long-term use.
 
@@ -7,7 +8,6 @@
 #  --name     Acceptable values: either 'nate' or 'shuh'. Ignored if --all is used.
 #  --filetype Acceptable values: either 'jpg' or 'mp4'. Ignored if --all is used.
 
-#!/bin/bash
 #set -x
 
 all=0
@@ -70,8 +70,8 @@ mover() {
 
   rm -rf /tmp/mover.list
   # Filenames containing spaces should have the spaces swapped out for underscores.
-  find /home/syncadmin/Dropbox/${name}/${finddir}/ -name "* *.${filetype}" -mtime +30 | while read file; do mv "$file" ${file// /_}; done
-  find /home/syncadmin/Dropbox/${name}/${finddir}/ -name *.${filetype} -mtime +30 -exec ls -l --time-style=+"%Y" {} \; | awk '{print $6 " " $7}' >> /tmp/mover.list
+  find "/home/syncadmin/Dropbox/${name}/${finddir}/" -name "* *.${filetype}" -mtime +30 | while read file; do mv "$file" "${file// /_}"; done
+  find "/home/syncadmin/Dropbox/${name}/${finddir}/" -name "*.${filetype}" -mtime +30 -exec ls -l --time-style=+"%Y" {} \; | awk '{print $6 " " $7}' >> /tmp/mover.list
 
   for year in $(awk '{print $1}' /tmp/mover.list | uniq)
   do
@@ -93,6 +93,11 @@ mover() {
   done
 }
 
+send_message() {
+  webhook="https://hooks.slack.com/services/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"
+  curl -X POST -H 'Content-type: application/json' --data "${1}" ${webhook}
+}
+
 main() {
   get_args "$@"
 
@@ -107,9 +112,9 @@ main() {
       do
         mover
       done
+      [[ $(find /home/syncadmin/Dropbox/${name}/ -name '*.jpg' -mtime -8 -o -name '*.mp4' -mtime -8 | wc -l) -eq 0 ]] && send_message "{\"text\": \"<@UT8HYKMQW>\n*WARNING*\nFrom: sync-1\nJob: dropbox-cleanup.sh\n\nNo new uploads detected in the last week for ${name}'s Dropbox. Please check the sync status.\"}"
     done
   fi
 }
 
 main "$@"
-
