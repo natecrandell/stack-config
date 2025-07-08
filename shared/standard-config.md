@@ -38,3 +38,16 @@ service zabbix-agent restart
 
 - Ensure that host config exists on zabbix server.
 - Add [newct] to Proxmox backup job
+
+## Cron Jobs
+
+```bash
+ln -s /mnt/libraries/config/stack/$(hostname)/zabbix-checks.cron /etc/cron.d/zabbix-checks
+ln -s /mnt/libraries/config/stack/shared/clean-cache.cron /etc/cron.d/clean-cache
+```
+
+## README
+
+```bash
+ln -s /mnt/libraries/config/stack/$(hostname)/README.md /root/README.md
+```
