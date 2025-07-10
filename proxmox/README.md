@@ -327,8 +327,6 @@ vim /home/ncrandell/.bashrc.d/mybash
 	vim /lib/systemd/system/zabbix-agent.service
 	After=ceph.target
 	systemctl daemon-reload
-	# This checks for Ceph degraded state:
-	ln -s /mnt/pve/cephfs/libraries/config/stack/proxmox/zabbix-checks.cron /etc/cron.d/zabbix-checks
 	echo "Hostname=cl-1" > /etc/zabbix/zabbix_agentd.d/hostname.conf
 	service zabbix-agent restart
 	
