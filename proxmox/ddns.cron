@@ -1,3 +1,2 @@
-#MAILTO="nate@crandell.us"
-# With MAILTO set, failed jobs will send the pwd in the subject line of an email...
-*/10 * * * * root bash -c 'curl "http://svc.joker.com/nic/update?username=2577b288cc177eb7&password=9d833cd96d738b5f&hostname=crandell.us" > /dev/null'
+*/10 * * * * root bash -c 'curl --silent "http://svc.joker.com/nic/update?username=2577b288cc177eb7&password=9d833cd96d738b5f&hostname=crandell.us" > /dev/null' > /dev/null
+
