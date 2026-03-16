@@ -1,6 +1,0 @@
-Apr  2 17:01:06 dnsmasq[208]: query[AAAA] nationalcoalitionforsexualhealth.org from 10.1.1.1
-Apr  2 17:01:06 dnsmasq[208]: query[A] nationalcoalitionforsexualhealth.org from 10.1.1.1
-Apr  2 17:01:06 dnsmasq[208]: query[HTTPS] nationalcoalitionforsexualhealth.org from 10.1.1.1
-Apr  2 19:37:21 dnsmasq[208]: query[AAAA] nationalcoalitionforsexualhealth.org from 10.1.1.1
-Apr  2 19:37:21 dnsmasq[208]: query[A] nationalcoalitionforsexualhealth.org from 10.1.1.1
-Apr  2 19:37:21 dnsmasq[208]: query[HTTPS] nationalcoalitionforsexualhealth.org from 10.1.1.1

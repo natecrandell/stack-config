@@ -1,6 +1,0 @@
-Jul 19 09:47:30 dnsmasq[209]: query[AAAA] porngifmag-com.webpkgcache.com from 10.1.1.1
-Jul 19 09:47:30 dnsmasq[209]: query[A] porngifmag-com.webpkgcache.com from 10.1.1.1
-Jul 19 09:47:30 dnsmasq[209]: query[HTTPS] porngifmag-com.webpkgcache.com from 10.1.1.1
-Jul 19 09:49:55 dnsmasq[209]: query[AAAA] cdn.sex.com from 10.1.1.1
-Jul 19 09:49:55 dnsmasq[209]: query[A] cdn.sex.com from 10.1.1.1
-Jul 19 09:49:55 dnsmasq[209]: query[HTTPS] cdn.sex.com from 10.1.1.1

@@ -1,4 +1,0 @@
-Jul  1 09:16:34 dnsmasq[210]: query[A] www.bellesa.co from 10.1.1.92
-Jul  1 09:18:48 dnsmasq[210]: query[A] s.bellesa.co from 10.1.1.92
-Jul  1 09:47:26 dnsmasq[210]: query[AAAA] content-autofill.googleapis.com from 10.1.1.92
-Jul  1 09:47:28 dnsmasq[210]: query[AAAA] godog.shopifycloud.com from 10.1.1.92

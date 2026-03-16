@@ -1,9 +1,0 @@
-Jan 20 09:41:57 dnsmasq[192]: query[AAAA] www-aznude-com.webpkgcache.com from 10.1.1.1
-Jan 20 09:41:57 dnsmasq[192]: query[A] www-aznude-com.webpkgcache.com from 10.1.1.1
-Jan 20 09:41:57 dnsmasq[192]: query[HTTPS] www-aznude-com.webpkgcache.com from 10.1.1.1
-Jan 20 09:43:01 dnsmasq[192]: query[A] www.sex.com from 10.1.1.1
-Jan 20 09:43:01 dnsmasq[192]: query[AAAA] www.sex.com from 10.1.1.1
-Jan 20 09:43:01 dnsmasq[192]: query[HTTPS] www.sex.com from 10.1.1.1
-Jan 20 09:43:02 dnsmasq[192]: query[HTTPS] videos.sex.com from 10.1.1.1
-Jan 20 09:43:02 dnsmasq[192]: query[AAAA] videos.sex.com from 10.1.1.1
-Jan 20 09:43:02 dnsmasq[192]: query[A] videos.sex.com from 10.1.1.1

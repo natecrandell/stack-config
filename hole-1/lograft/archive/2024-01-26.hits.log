@@ -1,6 +1,0 @@
-Jan 26 20:18:25 dnsmasq[181]: query[AAAA] erbiscusysexbu.info from 10.1.1.1
-Jan 26 20:18:25 dnsmasq[181]: query[HTTPS] erbiscusysexbu.info from 10.1.1.1
-Jan 26 20:18:25 dnsmasq[181]: query[A] erbiscusysexbu.info from 10.1.1.1
-Jan 26 21:01:42 dnsmasq[181]: query[AAAA] erbiscusysexbu.info from 10.1.1.1
-Jan 26 21:01:42 dnsmasq[181]: query[A] erbiscusysexbu.info from 10.1.1.1
-Jan 26 21:01:42 dnsmasq[181]: query[HTTPS] erbiscusysexbu.info from 10.1.1.1

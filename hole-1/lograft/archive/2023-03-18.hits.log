@@ -1,9 +1,0 @@
-Mar 18 09:07:48 dnsmasq[1694]: query[A] myteenwebcam.com from 10.1.1.92
-Mar 18 09:07:48 dnsmasq[1694]: query[AAAA] myteenwebcam.com from 10.1.1.92
-Mar 18 09:07:48 dnsmasq[1694]: query[HTTPS] myteenwebcam.com from 10.1.1.92
-Mar 18 09:08:29 dnsmasq[1694]: query[A] epawg.com from 10.1.1.92
-Mar 18 09:08:29 dnsmasq[1694]: query[AAAA] epawg.com from 10.1.1.92
-Mar 18 09:08:29 dnsmasq[1694]: query[HTTPS] epawg.com from 10.1.1.92
-Mar 18 09:09:30 dnsmasq[1694]: query[A] cdn.sex.com from 10.1.1.92
-Mar 18 09:09:30 dnsmasq[1694]: query[AAAA] cdn.sex.com from 10.1.1.92
-Mar 18 09:09:30 dnsmasq[1694]: query[HTTPS] cdn.sex.com from 10.1.1.92
